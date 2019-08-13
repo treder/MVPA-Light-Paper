@@ -50,24 +50,28 @@
 % Math symbols
 \newcommand{\al}{\boldsymbol{\alpha}}
 \newcommand{\m}{\mathbf{m}}
+\newcommand{\mf}[2]{m_#1^{(#2)}}
 \newcommand{\mbar}{\overline{\m}}
 \newcommand{\mm}[1]{\m_{#1}}
+\newcommand{\sig}[2]{(\sigma^2)_#1^{(#2)}}
 \newcommand{\w}{\mathbf{w}}
 \newcommand{\x}{\mathbf{x}}
+\newcommand{\xf}[1]{\mathbf{x}^{(#1)}} % x features
 \newcommand{\y}{\mathbf{y}}
-\newcommand{\C}{\mathbf{C}}
 \newcommand{\cov}{\text{cov}}
+\newcommand{\C}{\mathbf{C}}
+\newcommand{\E}{\mathbb{E}}   % expectation
 \newcommand{\I}{\mathbf{I}}
+\newcommand{\K}{\mathbf{K}}
 \renewcommand{\L}{\mathcal{L}}
+\newcommand{\M}{\mathbf{M}}
+\newcommand{\N}{\mathcal{N}}   % normal distribution
 \newcommand{\Q}{\mathbf{Q}}
 \newcommand{\R}{\mathbb{R}}
 \renewcommand{\S}{\mathbf{S}}
-\newcommand{\E}{\mathbb{E}}   % expectation
-\newcommand{\N}{\mathcal{N}}   % normal distribution
 \newcommand{\W}{\mathbf{W}}
 \newcommand{\X}{\mathbf{X}}
 
-\newcommand{\mvpa}{MVPA-Light}
 \newcommand{\ttt}[1]{\texttt{#1}}
 
 \newrefformat{fig}{Figure \ref{#1}}
@@ -107,7 +111,7 @@
 
 %%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
 \section{}
-MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides out-of-the-box classifiers without the need for additional MATLAB toolboxes or code compilation. The toolbox features native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automatised. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalisation (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
+MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automatised. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalisation (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
 
 
 
@@ -116,41 +120,27 @@ MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (M
  } %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section{Introduction}
-
-
 %%% -------- INTRODUCTION --------
 \section{Introduction}
 
-During the early 2010s, multivariate pattern analysis (MVPA) became a mainstream statistical tool in EEG/MEG research \citep{Lemm2011,Grootswagers2017DecodingData}. It can be considered as a complement to the set of traditional statistical tools available to researchers (e.g. t-test, ANOVA). MVPA is particularly suited to large, multivariate datasets. Furthermore, since many classifiers make few or no assumptions about the data distribution, and since  statistical significance is often established using permutation tests, MVPA can be considered as a set of non-parametric statistical tools.
+During the early 2010s, multivariate pattern analysis (MVPA) became a mainstream statistical tool in EEG/MEG research \citep{Lemm2011,Grootswagers2017DecodingData}. It can be considered as a complement to the set of traditional statistical tools available to researchers (e.g. t-test, ANOVA). MVPA is particularly suited to large, multivariate datasets. Furthermore, since many classifiers make few or no assumptions about the data distribution, and since  statistical significance is often established using permutation tests, MVPA can be considered as a set of non-parametric statistical tools. For a general introductions to machine learning for the classification of neuroimaging data, see \cite{Blankertz2011,Lemm2011,Mur2009,Grootswagers2017DecodingData,King2014}.
 
-One of the prime applications of MVPA is \textit{classification}. In classification, a multivariate pattern of brain activity across voxels/channels (e.g. ERP peak) is used to predict a brain state or experimental condition (e.g. face stimulus vs place stimulus). Classification is performed using a \textit{classifier}. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. However, in line with the wider machine learning community, but we will resort to the terms classifier/classification in the rest of the paper. It is noteworthy that classification is usually performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. In contrast, traditional statistics are usually applied at the group level, taking averages (e.g. ERPs) as inputs.
+One of the prime uses of MVPA is \textit{classification}. In classification, a multivariate pattern of brain activity across voxels/channels (e.g. ERP peak) is used to predict a brain state or experimental condition (e.g. face stimulus vs place stimulus). Classification is performed using a \textit{classifier}. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. However, in line with the wider machine learning community, but we will resort to the terms classifier/classification in the rest of the paper. It is noteworthy that classification is usually performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. In contrast, traditional statistics are usually applied at the group level, taking averages (e.g. ERPs) as inputs.
 
-A number of excellent MATLAB toolboxes for MVPA has been developed over the years, including the Berlin BCI toolbox \cite{Blankertz2016TheControl}, Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \cite{Kothe2013BCILAB:Development}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}. A comprehensive comparison of \mvpa{} with all these toolboxes is beyond the scope of this paper  ... 
-Are not actively developed, ... provide wrappers , miss a high-level interface, are intransparent, or use their specific data structures 
+A number of excellent MATLAB toolboxes for MVPA has been developed over the years, including the Berlin BCI toolbox \citep{Blankertz2016TheControl}, Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}. A comprehensive comparison of MVPA-Light with all these toolboxes is beyond the scope of this paper, but we believe that what sets MVPA-Light apart is the adherence to all of the following design principles: 
 
-
-
-We believe that what sets \mvpa{} apart is the fulfilment of the following design principles: 
+%Some of them are not actively being developed, provide wrappers for other toolboxes, miss a high-level interface, are intransparent, or use their specific data structures 
 
 \begin{itemize}
-\item transparency: the toolbox has a shallow code base with well-documented functions. In many cases, the function call stack has a depth of two within the toolbox. For instance, a call to \texttt{mv\_crossvalidate} using an LDA classifier triggers calls to functions such as  \texttt{mv\_check\_inputs}, \texttt{train\_lda} and \texttt{test\_lda}. Although the train/test functions might call additional optimisation functions, most of the work is done at these two shallowest levels. To preserve the shallowness, there are some redundancies across the toolbox. For instance, the high-level functions replicate some parts of code which could have been shared using a more modular approach. However, in this case the desire for readability and transparency trumps the avoidance of redundancies. Also for reasons of transparency, object orientation and encapsulation is avoided throughout the toolbox, using the simpler structs throughout.
-\item out-of-the-box native implementation: the toolbox is intended to be usable right after download. To be self-contained, no external toolboxes or specialised MATLAB machine learning toolboxes are required for operation. Furthermore, no code compilation is required, since all code is written in MATLAB, with native implementations down to the level of the optimisation algorithms. Many of the hyperparamaters required by classifiers can be set to 'auto'; the parameters are then automatically selected by \mvpa{}, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox.
-\item fast: all classifiers are implemented with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, LR and SVM use iterative optimisation algorithms written in MATLAB. However, these algorithms would run much faster using compiled code. To this end, an interface is provided for LIBSVM and LIBLINEAR, two excellent C implementations of LR and SVM for users who do not shy away from compiling the code on their platform.
-\item modular and pluggable: it is possible, and intended, to harvest parts of the code such as the classifiers for other purposes. It is also easy to plug the toolbox into a larger software framework. The fact that the toolbox does not use its own data format contributes to its 'pluggability'. All input data are just matrices and class labels come as vectors. This avoids the need for conversion functions that translate between different data formats. An interface for FieldTrip [REF] has been provided with relatively little effort as described in the Methods section.
-\item high-level and low-level interface: MVPA-Light has two access points. A high-level interface allows common MVPA tasks such as searchlight analysis and time generalisation including cross-validation to be performed with a couple of lines of MATLAB code. Low-level access is easy, too, since each classifier has train and test functions that can be accessed directly. 
+\item \textit{self-contained}: unlike many toolboxes that provide wrappers for existing classifiers, the backbone of MVPA-Light is  native implementations of various classifiers (LDA, kernel FDA, logistic regression, SVM, and ensemble methods) and their corresponding optimisation algorithms (Trust-Region Newton, Dual Coordinate Descent). As a result, MVPA-Light works out-of-the-box, without the need for additional toolboxes or  code compilation.
+\item \textit{transparent}: the toolbox has a shallow code base with well-documented functions. In many cases, the function call stack has a depth of two within the toolbox. For instance, a call to \texttt{mv\_crossvalidate} using an LDA classifier triggers calls to functions such as  \texttt{mv\_check\_inputs}, \texttt{train\_lda} and \texttt{test\_lda}. Although the train/test functions might call additional optimisation functions, most of the work is done at these two shallowest levels. To preserve the shallowness, high-level functions replicate code that might be shared otherwise. Furthermore, object orientation and encapsulation is avoided in favour of the more transparent MATLAB structs.
+\item \textit{fast}: all classifiers and high-level function are written with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, LR and SVM use iterative optimisation algorithms written in MATLAB. However, these algorithms run substantially faster using compiled code. To this end, an interface is provided for LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008}, two excellent C implementations of LR and SVM for users who do not shy away from compiling the code on their platform.
+\item \textit{modular and pluggable}: it is possible, and intended, to harvest parts of the code such as the classifiers for other purposes. It is also easy to plug the toolbox into a larger EEG/MEG processing framework. The fact that the toolbox does not use its own data format contributes to its 'pluggability'. All input data are just matrices and class labels come as vectors. This avoids the need for conversion functions that translate between different data formats. An interface for FieldTrip \citep{Oostenveld2011} has been provided with relatively little effort as described in the Methods section.
+\item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalisation including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparamaters required by classifiers can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox. In addition to this, each classifier has its own train and test functions. This allows for direct, low-level access to the classifiers. 
 \end{itemize}
 
+It is worth noting that MVPA-Light is a purely statistical toolbox. That is, it assumes that data has been preprocessed with a neuroimaging toolbox and comes in the shape of MATLAB arrays. Many toolboxes (e.g. FieldTrip, SPM, EEGLAB) store the imaging  data in such arrays, so that MVPA-Light can easily be used as a plugin tool. This comes with the perk that adaptation to other imaging modalities such as NIRS and fMRI is straightforward.
 
-Low-level: original optimisation algorithms for … most classifiers …
-
-includes Linear Discriminant Analysis (LDA), kernel Fisher Discriminant Analysis (FDA), Logistic Regression (LR), Support Vector Machines (SVM), and ensemble methods \cite{Hastie2009}.
-
-This toolbox
-
-
-
-For introductions to machine learning for the classification of neuroimaging data, see \cite{Blankertz2011,Lemm2011,Mur2009,Grootswagers2017DecodingData,King2014} ... Refer to e.g. \cite{Hastie2009,Bishop2007} for a textbook introductions into machine learning.
 
 
 % The toolboxes are systematically compared along a number of criteria detailed next:
@@ -170,7 +160,7 @@ For introductions to machine learning for the classification of neuroimaging dat
 
 \subsection{Getting started}
 
-\mvpa{} is shipped with a set of example scripts (in the \ttt{/examples} subfolder) and an example EEG dataset. The example scripts cover both the high-level functions in \mvpa and calling the train/test functions manually. The best starting point is to work through the example scripts and then adapt them to one's purpose. An up-to-date introduction to the toolbox with relevant hyperlinks is provided on the GitHub page (\ttt{github.com/treder/mvpa-light}).
+MVPA-Light is shipped with a set of example scripts (in the \ttt{/examples} subfolder) and an example EEG dataset. The example scripts cover both the high-level functions in MVPA-Light and calling the train/test functions manually. The best starting point is to work through the example scripts and then adapt them to one's purpose. An up-to-date introduction to the toolbox with relevant hyperlinks is provided on the GitHub page (\ttt{github.com/treder/mvpa-light}).
 
 The EEG data is taken from the free BNCI-Horizon-2020 data repository (http://bnci-horizon-2020.eu/database). The data consists of three \ttt{mat} files corresponding to three subjects (subject codes \ttt{VPaak}, \ttt{VPaan}, and \ttt{VPgcc}) from the music oddball dataset introduced in \cite{Treder2014}. Out of the experimental conditions, the "SynthPop" condition has been selected. Attended and unattended deviants are coded as class 1 and 2. The 64 EEG channels in the original dataset have been reduced to 32 channels.
 
@@ -189,6 +179,8 @@ perf = mv_crossvalidate(cfg, X, clabel);
 
 The output value \ttt{perf} contains the classifier performance measure, in this case a single AUC value averaged across test folds and repetitions. \ttt{mv\_crossvalidate} is part of the high-level interface that will be discussed next.
 
+In the next section, the toolbox will be described in more detail and an classification analysis based on a publicly available MEEG dataset will be reported upon \citep{Wakeman2015ADataset,Wakeman2014OpenfMRI}.
+
 %%% ------------------------
 %%% ------------------------
 %%% -------- METHOD --------
@@ -202,38 +194,20 @@ The output value \ttt{perf} contains the classifier performance measure, in this
 \subsection{High-level interface}
 
 
-The toolbox can be interacted with easily using a set of high-level functions that cover many common classification tasks. These functions perform an entire cross-validated classification analysis given a dataset with specific dimensions and class labels. \ttt{mv\_crossvalidate} performs  cross-validation on a 2-D [samples $\times$ features] dataset \ttt{X}. The next two functions, \ttt{mv\_classify\_across\_time}  and \ttt{mv\_classify\_timextime}, assume that the data has a time dimension as well, i.e. it is a 3-D [samples $\times$ features $\times$ time points] array. \ttt{mv\_classify\_across\_time} performs classification for every time point, resulting in a vector of cross-validated metrics (e.g. accuracy), the length of the vector being the number of time points. In contrast, \ttt{mv\_classify\_timextime} performs  classification for every combination of training and test time points, resulting in a matrix of cross-validated metrics. \ttt{mv\_searchlight} takes 2-D or 3-D input data and performs classification for every feature separately, resulting in a vector of cross-validated metrics, the length of the vector being the number of features (e.g. channels). Lastly, \ttt{mv\_classify} is a more general-purpose function that works on data of arbitrary dimension (e.g. time-frequency data). It combines the capabilities of all the other high-level functions at the expense, to some extent, of ease and speed.
+The toolbox can be interacted with high-level functions that cover many common classification tasks. \ttt{mv\_crossvalidate} performs a single cross-validation analysis on a 2-D [samples $\times$ features] dataset \ttt{X}. The next two functions, \ttt{mv\_classify\_across\_time}  and \ttt{mv\_classify\_timextime}, assume that the data has a time dimension as well, i.e. it is a 3-D [samples $\times$ features $\times$ time points] array. \ttt{mv\_classify\_across\_time} performs classification for every time point, resulting in a vector of cross-validated metrics (e.g. accuracy), the length of the vector being the number of time points. In contrast, \ttt{mv\_classify\_timextime} implements time generalization \citep{King2014}, that is, classification for every combination of training and test time points, resulting in a 2-D matrix of cross-validated metrics. \ttt{mv\_searchlight}  performs classification for every feature (e.g. EEG channels) separately, resulting in a vector of cross-validated metrics, the length of the vector being the number of features (e.g. channels). This is useful for identifying the spatial location of discriminative information. Lastly, \ttt{mv\_classify} is a more general-purpose function that works on data of arbitrary dimension (e.g. time-frequency data). It combines the capabilities of all the other high-level functions at the expense, to some extent, of ease and speed.
 
 All high-level functions take the three input arguments depicted in \prettyref{fig:X}. First, \ttt{cfg}, a configuration structure wherein hyperparameters for the analysis can be set. Second, \ttt{X}, the input data array of appropriate dimension. Third, \ttt{clabel}, a vector of class labels.
 Some of the parameters in the \ttt{cfg} struct are common  to all high-level functions:
 
-\todo{choose between param and hyperparameter}
-
 \begin{itemize}
     \item \ttt{cfg.classifier}: specifies the classifier (default \ttt{'lda'}). Classifiers are introduced in detail in \prettyref{sec:classifiers}.
     \item \ttt{cfg.hyperparameter}: a substruct that specifies the hyperparameters for the classifier. For instance, \ttt{cfg.hyperparameter.lambda = 0.1} sets the magnitude of shrinkage regularisation in LDA.
-    \item \ttt{cfg.param}: a substruct that specifies the hyperparameters for the classifier. For instance, \ttt{cfg.param.lambda = 0.1} sets the magnitude of shrinkage regularisation in LDA.
     \item \ttt{cfg.metric}: specifies the metric to be calculated from the classifier outputs. e.g. classification accuracy or AUC (default \ttt{'accuracy'}). Metrics are introduced in detail in \prettyref{sec:metrics}.
     \item \ttt{cfg.preprocess}: a substruct that specifies a nested preprocessing pipeline. The pipeline consists of preprocessing operations (e.g. z-scoring) that are applied on train and test data separately. Preprocessing is discussed in detail in \prettyref{sec:preprocessing}.
 \end{itemize}
 
 Additionally, the \ttt{cfg} struct includes the cross-validation settings explained in the next section.
 
-% \begin{table}
-% \centering
-% \footnotesize
-% \begin{tabularx}{\textwidth}{|c| l X |}
-%  \hline
-%  Input & Type & Description \\ [0.5ex]
-%  \hline\hline
-%  \ttt{cfg} & struct & MATLAB structure with parameters specifying details of the analysis (e.g. classifier, cross-validation, how to deal with imbalanced data)\\
-%  \ttt{X} & matrix  & EEG/MEG data matrix. Usually 2-D [samples x features] or 3-D [samples x features x time].  \\
-%  \ttt{clabel} & vector & vector of class labels \\ [1ex]
-%  \hline
-% \end{tabularx}
-% \caption{Input arguments to the high-level functions.}
-% \label{table:input}
-% \end{table}
 
 \subsubsection{Cross-validation}
 
@@ -249,53 +223,53 @@ To obtain a realistic estimate of classifier performance and control for overfit
 
 \subsubsection{Hyperparameter tuning}
 
-uses nested cross-validation ... 
+Hyperparameters are parameters describing a classifier that need to be specified by the user, such as the type and amount of regularisation applied, the type of kernel or kernel $\gamma$ for Gaussian kernels. From the user's perspective, hyperparameters can be nuisance parameters; it is often not clear a priori how to set them, but their exact value has a substantial effect on classification performance. 
 
-...
-Hyperparameters are often nuisance parameters ... It is usually not clear a priori how to set them, but their exact value ... has a substantial effect
-
-The perhaps most common approach is nested cross-validation, whereby a set of candidate hyperparameters is tested
-
-MVPA-Light supports hyperparameter optimisation using cross-validation. However, computationally more
+To efficiently automate or obliterate hyperparameter tuning, hyperparameter estimators (e.g., \cite{Ledoit2003HoneyMatrix} for LDA) or hyperparameter-free regularisers (Log(1,1) for Logistic Regression) are used. If is not possible, grid search is used for testing out different hyperparameter combinations by brute force; in a cross-validation setting, nested cross-validation is used for this purpose. For better performance, hyperparameter tuning is implemented within each classifier's train function, rather than using a generic tuning function.
 
 %%% ------- PREPROCESSING -------
 \subsubsection{Preprocessing}\label{sec:preprocessing}
 
-\ttt{cfg.balance} parameter, it is worth noting that undersampling is performed at the level of the repeats, whereas oversampling is performed only within each training set. This is necessary because in oversampling data points are  replicated. As a result, the same data point could end up both in the training set and in the test set, leading to overfitting.
+To not bias the classification result, preprocessing should ideally be performed in a 'nested' fashion. That is, it is performed on training data first and then applied to the test data using parameters estimated from the training data \cite{Lemm2011}. Currently implemented functions include z-scoring, sample averaging \citep{Cichy2017MultivariateSpace}, kernel averaging \citep{Treder2018}, and under-/oversampling for imbalanced data. Preprocessing pipelines are defined by adding the \ttt{cfg.preprocess} parameter. For instance,
+
+\begin{verbatim}
+cfg.preprocess = {'undersample', 'zscore', 'average_kernel'};
+\end{verbatim}
+
+adds a preprocessing pipeline that perfoms undersampling of the data followed by z-scoring and kernel averaging.
+
+% \subsubsection{Classification across time: \ttt{mv\_classify\_across\_time}}
+
+% Many neuroimaging datasets have a 3-D structure (trials x channels x time). The start of the trial (t=0) typically corresponds to stimulus or response onset. Classification across time can help identify at which time point in a trial discriminative information shows up. To this end, classification is performed across trials, for each time point separately. This is implemented in the function \ttt{mv\_classify\_across\_time}. It returns classification performance calculated for each time point in a trial.
 
 
-\subsubsection{Classification across time: \ttt{mv\_classify\_across\_time}}
+% \subsubsection{Time generalisation: \ttt{mv\_classify\_timextime}}
 
-Many neuroimaging datasets have a 3-D structure (trials x channels x time). The start of the trial (t=0) typically corresponds to stimulus or response onset. Classification across time can help identify at which time point in a trial discriminative information shows up. To this end, classification is performed across trials, for each time point separately. This is implemented in the function \ttt{mv\_classify\_across\_time}. It returns classification performance calculated for each time point in a trial.
+% Classification across time does not give insight into whether information is shared across different time points. For example, is the information that the classifier uses early in a trial (t=80 ms) the same that it uses later (t=300ms)? This question can be answered by training the classifier at t=80ms and testing it at t=300ms, and vice versa. Repeating this analysis for every possible combination of training time point and testing time point yields a [training time points $\times$ testing time points] matrix of classification results. In the literature, this kind of analysis is also known as time generalisation \cite{King2014}. The function  \ttt{mv\_classify\_timextime} implements time generalisation. It returns a 2D matrix of classification performance, with performance calculated for each combination of training time point and testing time point.
 
+% \subsubsection{Searchlight analysis:  \ttt{mv\_searchlight}}
 
-\subsubsection{Time generalisation: \ttt{mv\_classify\_timextime}}
-
-Classification across time does not give insight into whether information is shared across different time points. For example, is the information that the classifier uses early in a trial (t=80 ms) the same that it uses later (t=300ms)? This question can be answered by training the classifier at t=80ms and testing it at t=300ms, and vice versa. Repeating this analysis for every possible combination of training time point and testing time point yields a [training time points $\times$ testing time points] matrix of classification results. In the literature, this kind of analysis is also known as time generalisation \cite{King2014}. The function  \ttt{mv\_classify\_timextime} implements time generalisation. It returns a 2D matrix of classification performance, with performance calculated for each combination of training time point and testing time point.
-
-\subsubsection{Searchlight analysis:  \ttt{mv\_searchlight}}
-
-Which features contribute most to classification performance? The answer to this question can be used to to perform feature selection or to aid interpretability by localising the discriminative information in feature space. To this end, \ttt{mv\_searchlight} performs cross-validated classification for each feature separately. If there is a spatial structure in the features (e.g. neighbouring electrodes, neighbouring voxels), groups of features rather than single features can be considered. The result is a classification performance measure for each feature. If the features are e.g. channels, the result can be plotted as a topography.
+% Which features contribute most to classification performance? The answer to this question can be used to to perform feature selection or to aid interpretability by localising the discriminative information in feature space. To this end, \ttt{mv\_searchlight} performs cross-validated classification for each feature separately. If there is a spatial structure in the features (e.g. neighbouring electrodes, neighbouring voxels), groups of features rather than single features can be considered. The result is a classification performance measure for each feature. If the features are e.g. channels, the result can be plotted as a topography.
 
 
-\subsubsection{Classification of multi-dimensional data: \ttt{mv\_classify}}
+% \subsubsection{Classification of multi-dimensional data: \ttt{mv\_classify}}
 
-In some cases, a dataset can have more than 3 dimensions. An obvious example is time-frequency data which is 4-dimensional, e.g. samples $\times$ channels  $\times$ frequencies $\times$ time points. Even more complex datasets using e.g. connectivity data are easily conceivable. Furthermore, it is conceivable that the user wants to analyse the data in different ways. For instance, time-frequency example, one user may want a two-dimensional classification result obtained for each time/frequency point, using the channels as features. In other cases, it may be desirable to perform a time x time analysis, using both channels and frequencies as features, or a frequency x frequency analysis, using channels and time points as features. Clearly, a more flexible function is required that works with arbitrary data dimensionality and that allows for the designation of dimensions to be treated as features, for searchlight, or for generalisation.
+% In some cases, a dataset can have more than 3 dimensions. An obvious example is time-frequency data which is 4-dimensional, e.g. samples $\times$ channels  $\times$ frequencies $\times$ time points. Even more complex datasets using e.g. connectivity data are easily conceivable. Furthermore, it is conceivable that the user wants to analyse the data in different ways. For instance, time-frequency example, one user may want a two-dimensional classification result obtained for each time/frequency point, using the channels as features. In other cases, it may be desirable to perform a time x time analysis, using both channels and frequencies as features, or a frequency x frequency analysis, using channels and time points as features. Clearly, a more flexible function is required that works with arbitrary data dimensionality and that allows for the designation of dimensions to be treated as features, for searchlight, or for generalisation.
 
-It is worth pointing out that \texttt{mv\_classify} is a general-purpose function that is a generalisation of \texttt{mv\_searchlight}, \texttt{mv\_classify\_across\_time}, and \texttt{mv\_classify\_timextime}. In other words, any of these functions actions can be 'simulated' using \texttt{mv\_classify}.
+% It is worth pointing out that \texttt{mv\_classify} is a general-purpose function that is a generalisation of \texttt{mv\_searchlight}, \texttt{mv\_classify\_across\_time}, and \texttt{mv\_classify\_timextime}. In other words, any of these functions actions can be 'simulated' using \texttt{mv\_classify}.
 
 %%% -----------------------------
 %%% -------- CLASSIFIERS --------
 %%% -----------------------------
 \subsection{Classifiers}\label{sec:classifiers}
 
-Classifiers are implemented using pairs of train/test functions. In the high-level functions, training and testing is automated. However, the train/test functions can also be used 'by hand' if the user wants to avoid the high-level interface. For instance, an LDA classifier is trained by calling
+Classifiers are implemented using pairs of train/test functions. In the high-level functions, training and testing is automated. However, as a low-level interface, the train/test functions can be called directly. For instance, 
 
 \begin{verbatim}
 cf = train_lda(param, X, clabel)
 \end{verbatim}
 
-where \ttt{X} is the training data and \ttt{clabel} are the corresponding class labels. \ttt{param} is a MATLAB struct that contains hyperparameters. Hyperparameters are specific for each classifier. For instance, \ttt{param.lambda = 0.5} sets the regularisation hyperparameter in LDA to 0.5. In many cases, the default hyperparameters yield good results. However, for fine control of the hyperparameters, the user can refer to the documentation of the train functions. The hyperparameters for LDA can be accessed by typing \ttt{help(train\_lda)} in MATLAB. 
+calls the train function for an LDA classifier, where \ttt{X} is the training data and \ttt{clabel} are the corresponding class labels. \ttt{param} is a MATLAB struct that contains hyperparameters. Hyperparameters are specific for each classifier. For instance, \ttt{lambda = 0.5} sets the regularisation hyperparameter in LDA to 0.5. In many cases, the default hyperparameters yield good results. However, for fine control of the hyperparameters, the user can refer to the documentation of the train functions. The hyperparameters for LDA can be accessed by typing \ttt{help(train\_lda)} in MATLAB. 
 
 The output \ttt{cf} is a struct that describes the classifier after training. For linear classifiers, \ttt{cf.w} is the weight vector specifying the linear combination of features and \ttt{cf.b} is the threshold/bias term. The classifier can be applied to test data, denoted as \ttt{Xtest}, by calling
 
@@ -305,7 +279,7 @@ The output \ttt{cf} is a struct that describes the classifier after training. Fo
 
 The first output argument \ttt{clabel} is the \textit{predicted} class labels. They can be compared against the true class labels to calculate a classification performance metric. \ttt{test\_lda} provides two additional outputs, but not all classifiers have this capability. \ttt{dval} is the \textit{distance to the hyperplane/decision boundary}, a dimensionless distance measure. \ttt{prob} is a probability estimate, that is, the probability for a given sample to belong to class 1. For the time being, probablility estimate are only supported for two-class problems.
 
-If the high-level interface is used, the train/test functions are called  automatically. In this case, all the user is required to do is to specify the classifier when calling the high-level function, e.g. \ttt{cfg.classifier = 'lda'}. If desired, hyperparameters can be passed by setting the param substructure, e.g.  e.g. \ttt{cfg.param.lambda = 0.5}.
+If the high-level interface is used, the train/test functions are called  automatically. In this case, all the user is required to do is to specify the classifier when calling the high-level function, e.g. \ttt{cfg.classifier = 'lda'}. If desired, hyperparameters can be passed by setting the hyperparameter substructure, e.g.  e.g. \ttt{cfg.hyperparameter.lambda = 0.5}.
 
 In the following section, the individual classifiers are introduced. Whenever math is used, it is assumed that the data is contained in matrix $\X\in\R^{n \times p}$ of $n$ samples and $p$ predictors/features. The i-th row of this matrix is denoted as the column vector $\x_i\in\R^p$. For binary classification problems, it is assumed that the classes are coded as +1 and -1 and stored in a vector $\mathbf{y}\in\R^n$ with $y_i$ referring to the i-th class label.
 
@@ -356,25 +330,28 @@ In EEG/MEG data, $\S_w$ is often ill-conditioned or singular and hence the inver
 
 where $\I$ is the identity matrix and $\nu = \text{trace}(\S_w)/p$ \citep{Blankertz2011}. Shrinkage downweighs the off-diagonal elements of the scatter matrix. The regularisation hyperparameter $\lambda\in [0,1]$ blends between the unregularised covariance ($\lambda=0$) and spherical covariance ($\lambda=1$). For $\lambda=1$, LDA becomes a prototype classifier, that is, each sample is assigned to the closest centroid in feature space. By default, $\lambda$ is estimated automatically using the Ledoit-Wolf formula \citep{Ledoit2003HoneyMatrix,Blankertz2011}.
 
-In the literature, LDA has also been used with ridge-regression type regularisation, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularisation by setting \ttt{param.reg = 'ridge'}. However, both regularisation approaches are equivalent up to scaling. For a given shrinkage $\lambda<1$, the same regularisation effect can be obtained using ridge regularisation by setting $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$
+In the literature, LDA has also been used with ridge-regression type regularisation, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularisation by setting \ttt{reg = 'ridge'}. However, both regularisation approaches are equivalent up to scaling. For a given shrinkage $\lambda<1$, the same regularisation effect can be obtained using ridge regularisation by setting $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$
 \citep{Treder2018Cross-validationLDA}.
 
 
 %%% -------- KERNEL FDA --------
 \subsubsection{Kernel Fisher Discriminant Analysis: \ttt{'kernel\_fda'}}
 
-Kernel Fisher Discriminant Analysis (KFDA) is the kernelised version of LDA. Roughly speaking, kernels allow for the data to be mapped into a high-dimensional space wherein LDA is performed. Since the map is non-linear, the resultant hyperplane in high-dimensional space corresponds to a non-linear decision boundary in the original feature space \todo{ref Mika and Hastie/Bishop}. This allows for the solution of non-linear classification problems.
+Kernel Fisher Discriminant Analysis (KFDA) is the kernelised version of LDA. Roughly speaking, kernels allow for the data to be mapped into a high-dimensional space wherein LDA is performed. Since the map is non-linear, the resultant hyperplane in high-dimensional space corresponds to a non-linear decision boundary in the original feature space \cite{Mika1999FisherKernels}. This allows for the solution of non-linear classification problems. Let $\K\in\R^{n\times n}$ be the kernel matrix. Let $n_j$ be the number of samples in the $j$-th class and $\K_j\in\R^{n \times n_j}$ be the submatrix of $\K$ with rows corresponding to samples in class $j$. The kernelised versions of between-classes and within-class scatter are given by the matrices $\M$ and $\mathbf{N}$ as
 
-$\mathbf{N}^{-1} \mathbf{M}$
 
-Like in LDA, the model can be regularised using ridge regularisation (\ttt{param.reg = 'ridge'}) or shrinkage regularisation (\ttt{param.reg = 'shrink'}). Unlike LDA, there is currently no approach for automatically choosing the hyperparameter $\lambda$, so it needs to be set by the user.
+\begin{equation*}
+\begin{alignedat}{2}
+\M =\ &  \sum_{j=1}^C n_j\ (\M_j - \M_*)\,(\M_j-\M_*)^\top\\
+\mathbf{N} =\ & \sum_{j=1}^C \K_j\ (\mathbf{I} - \mathbf{1})\  \K_j^\top
+\end{alignedat}
+\end{equation*}
 
-\todo{finish up kernel fda}
+where $\M_j\in\R^n$ is the average of the columns of $\K_j$ and $\M_*$ is the average of the columns of $\K$. Then the solution is given by the $(C-1)$ leading eigenvectors of $\mathbf{N}^{-1} \mathbf{M}$. 
+Like in LDA, the model can be regularised using ridge regularisation (\ttt{reg = 'ridge'}) or shrinkage regularisation (\ttt{reg = 'shrink'}). For instance, using shrinkage, $\mathbf{N}$ is replaced by $\widetilde{\mathbf{N}} = (1-\lambda)\ \mathbf{N} + \lambda\,\nu\,\I$. Unlike LDA, there is currently no approach for automatically choosing the hyperparameter $\lambda$, so it needs to be set by the user.
 
 %%% -------- LOGISTIC REGRESSION --------
 \subsubsection{Logistic regression: \ttt{'logreg'}}
-
-\todo{integrate this sentence} LR is cast as a convex, unconstrained minimisation problem that is efficiently solved using a Trust Region algorithm with a Dogleg approach for the sub-problem. 
 
 In Logistic Regression (LR) for two classes, the class probabilities are modelled directly by fitting a logistic function to the data \citep{Hastie2009}. Given a data point $\x$ and weights $\w$, the probability is given by
 
@@ -390,22 +367,22 @@ where it is assumed that the threshold/bias is contained in the weight vector an
 \L_\text{LR}(\w) = \sum_{i=1}^n \log(1 + e^{-y_i\w^\top\x_i})
 \end{equation}
 
-This optimisation problem is convex and there is only one (global) optimum. However, there exists no analytical solution. Instead, an iterative algorithm is required to optimise $\w$. In \mvpa{}, the Trust Region Newton Method introduced by \cite{Lin2007TrustRegression} has been implemented in the function \ttt{TrustRegionDoglegGN.m}.
+This optimisation problem is convex and there is only one (global) optimum. However, there exists no analytical solution. Instead, an iterative algorithm is required to optimise $\w$. In MVPA-Light, the Trust Region Newton Method introduced by \cite{Lin2007TrustRegression} has been implemented in the function \ttt{TrustRegionDoglegGN.m}.
 
-To counteract overfitting, the user can choose between two regularisation approaches. In log-F(1,1) regularisation (\ttt{param.reg = 'logf'}), Jeffrey's prior is imposed on the weights \citep{Firth1993BiasEstimates,Rahman2017PerformanceData.,King2001}. The regularisation is implemented via data augmentation. Alternatively, L2-regularisation can be used to impose a Gaussian prior on the weights. In this case, a penalty term is added to the loss function:
+To counteract overfitting, the user can choose between two regularisation approaches. In log-F(1,1) regularisation (\ttt{reg = 'logf'}), Jeffrey's prior is imposed on the weights \citep{Firth1993BiasEstimates,Rahman2017PerformanceData.,King2001}. The regularisation is implemented via data augmentation. Alternatively, L2-regularisation can be used to impose a Gaussian prior on the weights. In this case, a penalty term is added to the loss function:
 
 \begin{equation}
-\label{eq:logreg_loss_function}
+\label{eq:logreg_loss_function_plus_penalty}
 \L_\text{LR}^{L2}(\w) = \L_\text{LR}(\w) + \frac{\lambda}{2}\, ||\w||^2
 \end{equation}
 
-Here, $\lambda\in [0,\infty)$ controls the amount of regularisation. While log-F(1,1) regularisation does not require any hyperparameters, L2-regularisation requires $\lambda$ to be set. It can be set to a fixed value by the user. Alternatively, a range of candidate $\lambda$'s can be specified (e.g. \ttt{param.lambda = [0.001, 0.01, 0.1, 1]}). A nested cross-validation is then performed to select the optimal $\lambda$.
+Here, $\lambda\in [0,\infty)$ controls the amount of regularisation. While log-F(1,1) regularisation does not require any hyperparameters, L2-regularisation requires $\lambda$ to be set. It can be set to a fixed value by the user. Alternatively, a range of candidate $\lambda$'s can be specified (e.g. \ttt{lambda = [0.001, 0.01, 0.1, 1]}). A nested cross-validation is then performed to select the optimal $\lambda$.
 Unfortunately, this kind of hyperparameter optimisation is very costly, since the classifier has to be trained multiple times for each value of the hyperparameter. To speed up optimisation, 'warm starts' are used; in warm starts, the initial value for $\w$, denoted as  $\w_\text{init}$, is set to the solution of the previous iteration. The initialisation regime works as follows:
 
 \begin{itemize}
     \item In iteration 1, $\w_\text{init}$ is initialised as the zero vector.
     \item In iterations 2 and 3, $\w_\text{init}$ is initialised by the previous $\w$'s ($\w_1$ and $\w_2$).
-    \item In iterations 4+, if \ttt{param.predict\_regularisation\_path=1}, then $\w_\text{init}$ is initialised by a predicted value for $\w$: for the
+    \item In iterations 4+, if \ttt{predict\_regularisation\_path=1}, then $\w_\text{init}$ is initialised by a predicted value for $\w$: for the
   k-th iteration, a quadratic polynomial is fit through $\w_{k-2}$, $\w_{k-1}$ and $\w_k$ as a function of their respective $\lambda$'s. The polynomial is then evaluated at $\lambda_k$ to obtain the prediction. Simulations show that this approach substantially reduces the number of iterations required for convergence.
 \end{itemize}{}
 
@@ -429,7 +406,7 @@ The optimal weights are found by minimising the constrained dual loss objective
 \end{align}
 
 where $\al\in\R^n$ is the dual weight vector and  $\mathbbm{1}$ is a vector of 1's. $\Q$ is the kernel matrix with the class labels absorbed, i.e. $\Q_{ij} = y_i y_j\, k(\x_i,\x_j)$, where $k$ is the kernel function, $y_i, y_j \in\{+1, -1\}$ are the class labels for the $i$-th and $j$-th sample, and the two classes are coded as +1 and -1. The optimisation of the weights is performed using the Dual Coordinate Descent
-approach by Hsieh et al. \cite{Hsieh2008ASVM} implemented in the function \ttt{DualCoordinateDescent}. The regularisation hyperparameter $c$ is controlled by setting \ttt{param.c}.
+approach by Hsieh et al. \cite{Hsieh2008ASVM} implemented in the function \ttt{DualCoordinateDescent}. The regularisation hyperparameter $c$ is controlled by setting \ttt{c}.
 
 
 Class labels and decision values are calculated. Unlike LDA and logistic regression,
@@ -443,8 +420,40 @@ class probabilities.
 
 The \ttt{ensemble} classifier implements a meta-classifier that trains dozens
 or even hundreds of classifiers such as LDA. The rationale behind training a large number of classifiers is that if each classifer manages to learn slightly different aspects about the data, their joint performance can be better than the performance of any individual classifier.
-In emsemble methods, these individual classifiers are called \textit{learners}. In \mvpa{}, learners are set using the \ttt{param.learner} argument. For instance, setting \ttt{param.learner = 'lda'} trains a number of LDA classifiers. To force the learners to focus on different aspects of the data, every learner sees not the whole training data but just a subset of it. \ttt{param.nsamples} controls the number or fraction of training samples that is randomly subselected, whereas \ttt{param.nfeatures} controls the number of fraction of features.
-The final classifier outut is determined via the voting strategy. If \ttt{param.stragey = 'vote'}, then the class label produced by each individual learner serves as a vote. The class that receives the maximum number of votes is then selected. If \ttt{param.stragey = 'dval'}  then the raw decision values are averaged and the final decision is taken based on whether the average is positive or negative. The latter only works for two-class classification problems.
+In emsemble methods, these individual classifiers are called \textit{learners}. In MVPA-Light, learners are set using the \ttt{learner} argument. For instance, setting \ttt{learner = 'lda'} trains a number of LDA classifiers. To force the learners to focus on different aspects of the data, every learner sees not the whole training data but just a subset of it. \ttt{nsamples} controls the number or fraction of training samples that is randomly subselected, whereas \ttt{nfeatures} controls the number of fraction of features.
+The final classifier outut is determined via the voting strategy. If \ttt{stragey = 'vote'}, then the class label produced by each individual learner serves as a vote. The class that receives the maximum number of votes is then selected. If \ttt{strategy = 'dval'}  then the raw decision values are averaged and the final decision is taken based on whether the average is positive or negative. The latter only works for two-class classification problems.
+
+%%% -------- NAIVE BAYES --------
+\subsubsection{Naive Bayes: \ttt{'naive\_bayes'}}
+
+In Naive Bayes classification, the features are assumed to be conditionally independent of each other given the class label \citep{Bishop2007}. While this is indeed naive and often wrong, Naive Bayes has nevertheless been remarkably successful in classification problems. The independence assumption loads to a straightfoward calculation of the posterior class probability $P(y = k\,|\,\x)$, since only univariate densities need to be estimated. Let $\xf{j}$ be the $j$-th feature and $\x = [\xf{1}, \xf{2}, ..., \xf{p}]^\top$ be a feature vector then by the Bayes formula we have
+
+\begin{equation}
+\label{eq:naive_bayes}
+P(y = k\,|\,\x) = \frac{P(y = k)\,\prod_{j=1}^p P(\xf{j}\,|\,k)}{P(\x)}
+\end{equation}
+
+MVPA-Light uses Gaussians to model the univariate densities, that is $P(\xf{j}\,|\,k) = \frac{1}{\sqrt{2\pi\sig{k}{j}}} \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})$. The parameters of the model are thus the $\mf{k}{j}$'s (mean of the $j$-the feature in class $k$) and $\sig{k}{j}$'s (variance of the $j$-the feature in class $k$) estimated on the training data. Inserting the Gaussian densities into \prettyref{eq:naive_bayes} yields
+
+\begin{equation}
+\label{eq:naive_bayes_gaussian}
+P(y = k\,|\,\x) = \frac{P(y = k)\,\prod_{j=1}^p \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})}%
+{\sum_{k=1}^C P(y = k)\,\prod_{j=1}^p \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})}.
+\end{equation}
+
+Classification is more computationally efficient if the denominator (which is necessary for normalisation only) is omitted and the numerator is log transformed. This leads to the class-conditional decision values $d_k$,
+
+\begin{equation}
+\label{eq:naive_bayes_dval}
+d_k = \log P(y = k) - \sum_{j=1}^p \frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}}
+\end{equation}
+
+which can be transformed into posterior probabilities using the softmax function 
+
+\begin{equation}
+\label{eq:naive_bayes_softmax}
+P(y = k\,|\,\x) = \frac{e^{d_k}}{\sum_{j=1}^C e^{d_j}}.
+\end{equation}
 
 %%% ---------------------------------
 %%% ----   CLASSIFIER OUTPUT     ----
@@ -452,7 +461,7 @@ The final classifier outut is determined via the voting strategy. If \ttt{param.
 \subsection{Classifier output type}\label{sec:output}
 
 For every test sample, a classifier produces raw output. This output takes either a discrete form, as a class label (e.g. '1' for class 1), or a continuous one. If it is continuous, it comes either as a \textit{decision value} or as a \textit{probability}.
-In the high-level interface, the classifier output can be specified explicitly by setting \ttt{cfg.output\_type} to \ttt{'clabel'}, \ttt{'dval'}, or \ttt{'prob'}. For most cases, however, it suffices to let \mvpa{} infer the class label. Note that decision values or probabilities are not supported for multi-class problems. This is because in multi-class the classifier output can be multi-dimensional. For two classes, the probability is a number between 0 and 1 specifying the probability that a sample belongs to class 1. Decision value is an unbounded number that can be positive or negative. Its absolute value corresponds to the distance to the hyperplane.
+In the high-level interface, the classifier output can be specified explicitly by setting \ttt{cfg.output\_type} to \ttt{'clabel'}, \ttt{'dval'}, or \ttt{'prob'}. For most cases, however, it suffices to let MVPA-Light infer the class label. Note that decision values or probabilities are not supported for multi-class problems. This is because in multi-class the classifier output can be multi-dimensional. For two classes, the probability is a number between 0 and 1 specifying the probability that a sample belongs to class 1. Decision value is an unbounded number that can be positive or negative. Its absolute value corresponds to the distance to the hyperplane.
  If the value is positive, the predicted class label is 1; if it is negative, the predicted class label is 2.
 
 %%% ---------------------------------
@@ -477,22 +486,17 @@ This metric should reflect the degree of separability between the classes. Numer
 
 If cross-validation is used then the metric is initially calculated for each test set in each repetition separately. It is then averaged across test sets and repetitions. Since the number of samples in a test set can vary a proportionally weighted average is used whereby larger test sets get a larger weight.
 
-%%% -------------------------
-%%% ----  EXTENDABILITY  ----
-%%% -------------------------
-\subsection{Extendability}\label{sec:extendability}
+\subsection{Custom classifiers}
 
-\subsubsection{Custom classifiers}
+MVPA-Light can easily be extended with custom classifiers. To this end, the appropriate train and test functions need to be implemented. Additionally, default hyperparamaters for the classifier need to be added to the function \ttt{mv\_get\_hyperparameter}. In the appendix, it is shown how to implement a prototype classifier that assigns a sample to the closest class centroid.
 
-\mvpa{} can easily be extended with custom classifiers. To this end, the appropriate train and test functions need to be implemented. Additionally, default hyperparamaters for the classifier need to be added to the function \ttt{mv\_get\_classifier\_param}. In the appendix, it is shown how to implement a prototype classifier that assigns a sample to the closest class centroid.
+\subsection{LIBSVM and LIBLINEAR}
 
-\subsubsection{LIBSVM and LIBLINEAR}
+LIBSVM \cite{Chang2011LIBSVM:Machines} and LIBLINEAR \cite{Fan2008} are two high-performance libraries for SVM and Logistic Regression. Due to the usage of compiled C-code, the functions are faster than classifiers programmed in MATLAB. In order to use the libraries with MVPA-Light, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In MVPA-Light, the classifiers are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}. For a description of the hyperparameters, refer to the functions  \ttt{train\_libsvm} and \ttt{train\_liblinear}.
 
-LIBSVM \cite{Chang2011LIBSVM:Machines} and LIBLINEAR \cite{Fan2008} are two high-performance libraries for SVM and Logistic Regression. Due to the usage of compiled C-code, the functions are faster than classifiers programmed in MATLAB. In order to use the libraries with \mvpa{}, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In \mvpa{}, the classifiers are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}. For a description of the hyperparameters, refer to the functions  \ttt{train\_libsvm} and \ttt{train\_liblinear}.
+\subsection{FieldTrip integration}
 
-\subsubsection{FieldTrip integration}
-
-\mvpa{} is a stand-alone toolbox. However, for users of FieldTrip [REF] there is a FieldTrip interface \ttt{ft\_statistics\_mvpa} that provides a direct interface between FieldTrip and \mvpa{}. High-level FieldTrip statistics functions such as \ttt{ft\_timelockstatistics} ... can be used with the parameter \ttt{cfg.method = 'mvpa'} ... The analysis is then passed on ... Users are recommended to follow the tutorial on the FieldTrip website [FOOTNOTE].
+MVPA-Light is a stand-alone toolbox. However, for users of FieldTrip \citep{Oostenveld2011} the function  \ttt{ft\_statistics\_mvpa} provides a direct interface between FieldTrip and MVPA-Light. In brief, the function calls MVPA-Light functions to carry out classification analysis, and then packs the results back into FieldTrip structs. To use MVPA-Light from high-level FieldTrip statistics functions such as \ttt{ft\_timelockstatistics}, one has to set the parameter \ttt{cfg.method = 'mvpa'}. The interface is introduced in detail in a tutorial on the FieldTrip website \footnote{\ttt{http://www.fieldtriptoolbox.org/tutorial/mvpa\_light/}}.
 
 %%% -------------------------
 %%% ----  DEVELOPMENT    ----
@@ -501,68 +505,18 @@ LIBSVM \cite{Chang2011LIBSVM:Machines} and LIBLINEAR \cite{Fan2008} are two high
 
 Apart from the \ttt{main} branch intended for general use, the GitHub repository features a \ttt{devel} branch wherein new code is developed before merging into the main branch. Additionally, the branch features code that helps in maintaining the integrity of the toolbox. The \ttt{unittests/} subfolder features a unit testing framework with specific unit tests for all classifiers, optimisation algorithms, high-level functions and some of the important utility functions. The unit tests make use of both the example EEG data, random noise, and simulated data generated from functions contained in the \ttt{simulation/} subfolder. Unit testing can be triggered by executing the \ttt{run\_all\_unittests} function.
 
-%%% -------------------------
-%%% ----  BENCHMARKIN    ----
-%%% -------------------------
-\subsection{Benchmarking}\label{sec:benchmarking}
-
-In this section,
-MATLAB based toolboxes ...
-namely Cosmovpa, Pronto, and DMLT ... IT is also compared to the Python toolbox Sci-kit learn.
-
-- out-of-the-box accuracy : accuracy without manual tuning of the hyperparameters by the user
-
-- speed:
-
-As dataset ... we used
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% -------- REGULARISATION  --------   %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Regularisation}
-
-Each of the classifiers has the capability to automatically tune the hyperparameters. To further speed up tuning, the covariance is diagonalised (LDA), warm starts and quadratic path prediction are performed (logistic regression), and the analytical regularisation path is implemented (linear SVM). Additionally, higher-level functions for cross-validation, classification across time, time-by-time generalisation, and searchlight analysis are provided.
-
-...
-
-
-\subsection{Fast regularisation paths}
-
-
-Cross-validation … a search grid … The set of classifier weights as a function of the hyperparameter(s) is also known as regularisation path
-Unfortunately, manual search … is very computationally costly … since the classifier needs to be re-trained for every value or combination of values of the hyperparameter(s). To speed up this process, … computational tricks for speed-up
-
-\subsubsection{Regularisation path for LDA}
-Use Automatic estimation
-Grid search: LDA involves inversion of the regularised covariance matrix. There is no cheap way to update the covariance matrix in this regularisation regime. Instead, MVPA-Light goes the following route: the data is first mapped into principal component space. The advantage here is that the covariance matrix is then diagonal and inverting a diagonal matrix is very simple... In particular the operation $C^-1$ p simply becomes $(1./D) .* p$ where $D_i = (1-lambda) sigma_i + lambda * nu$ are the regularised diagonal elements of C in PC space and $sigma_i$ is the i-th eigenvalue of C.
-Simulation: compare path with and without PCA
-
-\subsubsection{Regularisation path for logistic regression}
-
-... warm start with the following parameters ... In the first iteration, $\w_0 = (\m_1 - \m_2)$, the vector connecting the class means. Set of $\lambda$'s $\{\lambda_1, \lambda_2, ...\}$ and a start vector $\w_0$
-
-\begin{itemize}
-\item $\lambda_1$-iteration: Set $\w_0\leftarrow \m_1 - \m_2$, where $\m_1$ and $\m_2$ are the class means.
-\item $\lambda_2$ and $\lambda_3$ iterations: Set $\w_0\leftarrow \w_1$ resp. $\w_0\leftarrow \w_2$.
-\item $\lambda_k$ iteration (k$>$3): Fit a quadratic polynomial $p(\lambda)$ through the points $\{(\lambda_{k-1},\w_{k-1}), (\lambda_{k-2},\w_{k-2}), (\lambda_{k-3},\w_{k-3})\}$. Set $\w_0 \leftarrow p(\lambda_k)$.
-\end{itemize}
-
-\subsubsection{Regularisation path for SVM}
-Use Hastie et al procedure for estimating the full regularisation path
-
-
 \subsection{Analysing a MEEG dataset}
 
+To illustrate MVPA-Light on a real dataset, in this section a multivariate analysis of the multisubject, multimodal face processing by \citep{Wakeman2015ADataset,Wakeman2014OpenfMRI} will be conducted. The dataset contains 16 participants with EEG and MEG simultaneously recorded. Refer to  \cite{Wakeman2015ADataset} for details on the collected data. The MEEG data was preprocessed using FieldTrip. It was low-pass filtered with a cut-off of 100 Hz, high-pass filtered with a FIR one-pass zero-phase filter with a cut-off of 0.1 Hz. A bandstop filter was applied at 50 Hz to suppress line noise. Furthermore, data was downsampled to 220 Hz and for each subject, the 6 separate runs were combined into a single dataset, yielding 880--889 trials per subject with roughly equal proportions for the three classes. All trials displaying famous faces were coded as class 1, familiar faces as class 2, and scrambled faces as class 3. MVPA was performed to answer the following questions:
 
+\begin{enumerate}
+    \item \cite{Wakeman2015ADataset} found two prominent ERP components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier will be used to investigate which kind of discriminative information is contained in both ERP/ERF components.
+    \item To investigate whether both ERP/ERF components reflect similar representations, time generalisation (time x time classification) will be used.
+    \item Is the discriminative information for famous vs scrambled faces confined to specific oscillatory frequencies and times? To this end classification will be performed for each time-frequency point separately. Furthermore, frequency x frequency classification will be used to investigate whether 
+    \item Is there more discriminative information in MEG than in EEG? Compare ERP classification across time for EEG, MEG and EEG+MEG combined. 
+\end{enumerate}
 
-
-\begin{itemize}
-\item $\lambda_1$-iteration: Set $\w_0\leftarrow \m_1 - \m_2$, where $\m_1$ and $\m_2$ are the class means.
-\item $\lambda_2$ and $\lambda_3$ iterations: Set $\w_0\leftarrow \w_1$ resp. $\w_0\leftarrow \w_2$.
-\item $\lambda_k$ iteration (k$>$3): Fit a quadratic polynomial $p(\lambda)$ through the points $\{(\lambda_{k-1},\w_{k-1}), (\lambda_{k-2},\w_{k-2}), (\lambda_{k-3},\w_{k-3})\}$. Set $\w_0 \leftarrow p(\lambda_k)$.
-\end{itemize}
+In all analyses, MVPA was performed at the sensor level. Performed MVPA at the sensor level ... and time-frequency analysis
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -570,11 +524,15 @@ Use Hastie et al procedure for estimating the full regularisation path
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Results}
 
+\todo{report results}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- DISCUSSION --------   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
 
+
+\todo{write discussion}
 
 For SVM, ... analytical solution ... regularisation \citep{Hastie2004TheMachine}
 
@@ -586,9 +544,9 @@ An Achilles' heel, ... future efforts , ... the extension of the statistical ana
 
 \subsection{Implementing a prototype classifier}
 
-This section illustrates how to implement a custom classifier. A prototype classifier assigns a new sample to the class with the closest class centroid. Class centroids are calculated from the training data by calculating the means of the samples within each class. This example is solely didactic. A prototype classifier can be simulated with LDA or multi-class LDA when setting \ttt{cfg.reg = 'shrink'} and \ttt{cfg.lambda = 1}.
+This section illustrates how to implement a custom classifier. A prototype classifier assigns a new sample to the class with the closest class centroid. Class centroids are calculated from the training data by calculating the means of the samples within each class. This example is solely didactic. A prototype classifier can be simulated with LDA or multi-class LDA when setting \ttt{reg = 'shrink'} and \ttt{lambda = 1}.
 
-First, the train function needs to be implemented. As input arguments, train functions  take a  struct of hyperparameters \ttt{param},  the training data \ttt{X} and the corresponding  class labels \ttt{clabel}. For brevity, most of the documentation is omitted.
+First, the train function needs to be implemented. As input arguments, train functions take a \ttt{param} struct which is short notation for 'hyperparameter'. It corresponds to the \ttt{cfg.hyperparameter} struct defined in the high-level functions. Additionally, it takes the training data \ttt{X} and the corresponding class labels \ttt{clabel}. For brevity, most of the documentation is omitted.
 
 \begin{verbatim}
     function cf = train_prototype(param,X,clabel)
@@ -605,7 +563,7 @@ First, the train function needs to be implemented. As input arguments, train fun
     end
 \end{verbatim}
 
-The output of the train function is a structure \ttt{cf} that describes the parameter of the classifier after training. The test function takes the classifier \ttt{cf} and the test data \ttt{X} as input. We need to calculate the Euclidean distance between each test sample and each of the centroids. Then, each sample is assigned to the class whose centroid is closest.
+The output of the train function is a structure \ttt{cf} that describes the parameters of the classifier after training. The test function takes the classifier \ttt{cf} and the test data \ttt{X} as input. For classification, we need to calculate the Euclidean distance between each test sample and each of the centroids. Then, each sample is assigned to the closest class centroid.
 
 \begin{verbatim}
     function clabel = test_prototype(cf,X)
@@ -625,7 +583,7 @@ The output of the train function is a structure \ttt{cf} that describes the para
 
 \end{verbatim}
 
-The output of the test function is \ttt{clabel}, the vector of predicted class labels. Finally, an entry for \ttt{prototype} needs to be added to the function \ttt{mv\_get\_classifier\_param}. Since the prototype classifer has no hyperparamaters, this entry can be empty. Provided that the train and test functions are in the MATLAB path, the new classifier can be used with all high-level functions by setting \ttt{cfg.classifier = 'prototype'}.
+The output of the test function is \ttt{clabel}, the vector of predicted class labels. Finally, an entry for \ttt{prototype} needs to be added to the function \ttt{mv\_get\_hyperparameter}. Since the prototype classifer has no hyperparamaters, this entry can be empty. Provided that the train and test functions are in the MATLAB path, the new classifier can be used with all high-level functions by setting \ttt{cfg.classifier = 'prototype'}.
 
 
 \section*{Conflict of Interest Statement}
@@ -641,14 +599,10 @@ MT developed the toolbox, performed all analyses and authored the manuscript.
 Details of all funding sources should be provided, including grant numbers if applicable. Please ensure to add all necessary funding information, as after publication this is no longer possible.
 
 \section*{Acknowledgments}
-I would like to thank colleagues at University of Birmingham (particularly the research groups of Bernhard Staresina, Maria Wimber, Simon Hanslmayr, and Ian Charest) and Cardiff University for early advice and adaptation of the toolbox. 
-I would also like to thank Sophie Arana and Jan-Mathijs Schoffelen for their effort and advice towards integrating the toolbox in FieldTrip.
-
-\section*{Supplemental Data}
- \href{http://home.frontiersin.org/about/author-guidelines#SupplementaryMaterial}{Supplementary Material} should be uploaded separately on submission, if there are Supplementary Figures, please include the caption in the same file as the figure. LaTeX Supplementary Material templates can be found in the Frontiers LaTeX folder.
+I would like to thank colleagues at University of Birmingham (particularly the research groups of Bernhard Staresina, Maria Wimber, Simon Hanslmayr, and Ian Charest) and Cardiff University for valuable advice and early adaptation of the toolbox. I would also like to thank Jan-Mathijs Schoffelen and Sophie Arana for their effort and advice towards integrating the toolbox in FieldTrip.
 
 \section*{Data Availability Statement}
-The datasets [GENERATED/ANALYZED] for this study can be found in the [NAME OF REPOSITORY] [LINK]. All scripts used for this paper are available in the GitHub repository \texttt{github.com/treder/MVPA-Light-paper}.
+The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org/datasets/ds000117/versions/1.0.3). All scripts used for this paper are available in the accompanying GitHub repository (github.com/treder/MVPA-Light-Paper).
 % Please see the availability of data guidelines for more information, at https://www.frontiersin.org/about/author-guidelines#AvailabilityofData
 
 \bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
@@ -668,9 +622,13 @@ The datasets [GENERATED/ANALYZED] for this study can be found in the [NAME OF RE
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=.6\linewidth]{X_clabel_cfg}
-\caption{The three most commonly used input arguments in \mvpa. Colours are used to represent the two classes 1 (turquoise) and 2 (red) for illustrative purposes. Note that \ttt{X} can be  three-dimensional (e.g. if it also has a time dimension) or higher-dimensional (e.g. time-frequency data).}\label{fig:X}
+\caption{The three most commonly used input arguments in MVPA-Light. Colours are used to represent the two classes 1 (turquoise) and 2 (red) for illustrative purposes. Note that \textbf{X} can be three-dimensional (e.g. if it also has a time dimension) or even higher-dimensional (e.g. time-frequency data).}\label{fig:X}
 \end{figure}
 
+\begin{figure}[ht!]
+\centering\includegraphics[width=\linewidth]{fig1_MVPA_structure}
+\caption{Structure of the toolbox.}\label{fig:structure}
+\end{figure}
 
 %%% If you are submitting a figure with subfigures please combine these into one image file with part labels integrated.
 %%% If you don't add the figures in the LaTeX files, please upload them when submitting the article.
