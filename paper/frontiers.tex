@@ -470,19 +470,36 @@ In the high-level interface, the classifier output can be specified explicitly b
 \subsection{Classifier performance metrics}\label{sec:metrics}
 
 In most cases, the user is not interested in the raw classifier output. Rather, the quantity of interest is a performance metric that is calculated from the classifier outputs.
-This metric should reflect the degree of separability between the classes. Numerous metrics have been proposed in the literature.  When using the high-level interface, the desired metric can be specified by e.g. setting \ttt{cfg.metric = 'accuracy'}. Multiple metrics can be specified by providing a cell array, e.g. \ttt{cfg.metric = \{'accuracy', 'auc'\}}. When not using the high-level interface, the metrics can be calculated by hand using the function \ttt{mv\_calculate\_performance}. In the following, the available implemented are briefly introduced. For a more thorough discussion of classification metrics, refer to  \cite{Sokolova2009ATasks}.
+This metric should reflect the degree of separability between the classes. Numerous metrics have been proposed in the literature.  When using the high-level interface, the desired metric can be specified by e.g. setting \ttt{cfg.metric = 'accuracy'}. Multiple metrics can be specified by providing a cell array, e.g. \ttt{cfg.metric = \{'accuracy', 'auc'\}}. When not using the high-level interface, the metrics can be calculated by hand using the function \ttt{mv\_calculate\_performance}. \prettyref{tab:metrics} lists the metrics implemented in MVPA-Light. For a more thorough discussion of classification metrics, refer to  \cite{Sokolova2009ATasks}.
 
-\begin{itemize}
-    \item \ttt{'accuracy'}: Classification accuracy represents the fraction correctly predicted class labels. Accuracy is a very popular metric, but it can be misleading when the classes are very imbalanced. The value ranges from 0 to 1 where 1 means perfect separation between the classes. If all classes have equal numbers of samples, the chance level is given by 1 divided by the number of classes.
-    \item \ttt{'auc'} (for two classes only): Area under the ROC curve (AUC) is an alternative to classification accuracy. It is more robust to imbalanced classes and independent of changes to the classifier threshold. It requires continuous output from the classifier (decision values or probabilities). The value ranges from 0 to 1 where 0.5 means chance-level performance and 1 means perfect separation between the classes.
-    \item \ttt{'confusion'}: The confusion matrix is a $c\times c$ matrix, $c$ being the number of classes. Rows corresponds to true class labels, columns correspond to predicted class labels. Consequently, the diagonal gives the proportion of correct classification for each class, whereas all off-diagonal elements specify the misclassifications. Concretely, the (i,j)-th element gives the proportion of samples of class i that have been classified as class j. A confusion matrix is very useful for multi-class problems since it elucidates which classes are systematically mistaken for each other.
-    \item \ttt{'dval'} (for two classes only): Average decision value, for each class separately.
-    \item \ttt{'precision'}: the number of true positives divided by true positives plus false positives; represents the fraction of samples labelled as positive (+1) that actually belong to the positive class. For multi-class, it is calculated per class from the unnormalised confusion matrix by dividing each diagonal element by the row sum.
-    \item \ttt{'recall'} : the number of true positives divided by true positives plus false negatives; represents the fraction of samples of the positive class that have actually been detected as such. For multi-class, it is calculated per class from the confusion matrix by dividing each diagonal element by the respective column sum.
-    \item \ttt{'f1'} : the F1 score combines precision and recall into a single score given by the harmonic average $2*$\ttt{precision}$*$\ttt{recall} / (\ttt{precision} + \ttt{recall}).
-    \item \ttt{'tval'}: for two classes, calculates the t-test statistic for the unequal sample size, equal variance case, based on decision values. This metric can be useful as a first step for a subsequent second-level analysis across participants.
-    \item \ttt{'none'}: If \ttt{cfg.metric = 'none'}, then no metric is being calculated. Instead, a cell array with the raw classifier outputs for all test sets is returned.
-\end{itemize}
+% \begin{itemize}
+%     \item \ttt{'accuracy'}: Classification accuracy represents the fraction correctly predicted class labels. Accuracy is a very popular metric, but it can be misleading when the classes are very imbalanced. The value ranges from 0 to 1 where 1 means perfect separation between the classes. If all classes have equal numbers of samples, the chance level is given by 1 divided by the number of classes.
+%     \item \ttt{'auc'} (for two classes only): Area under the ROC curve (AUC) is an alternative to classification accuracy. It is more robust to imbalanced classes and independent of changes to the classifier threshold. It requires continuous output from the classifier (decision values or probabilities). The value ranges from 0 to 1 where 0.5 means chance-level performance and 1 means perfect separation between the classes.
+%     \item \ttt{'confusion'}: The confusion matrix is a $c\times c$ matrix, $c$ being the number of classes. Rows corresponds to true class labels, columns correspond to predicted class labels. Consequently, the diagonal gives the proportion of correct classification for each class, whereas all off-diagonal elements specify the misclassifications. Concretely, the (i,j)-th element gives the proportion of samples of class i that have been classified as class j. A confusion matrix is very useful for multi-class problems since it elucidates which classes are systematically mistaken for each other.
+%     \item \ttt{'dval'} (for two classes only): Average decision value, for each class separately.
+%     \item \ttt{'precision'}: the number of true positives divided by true positives plus false positives; represents the fraction of samples labelled as positive (+1) that actually belong to the positive class. For multi-class, it is calculated per class from the unnormalised confusion matrix by dividing each diagonal element by the row sum.
+%     \item \ttt{'recall'} : the number of true positives divided by true positives plus false negatives; represents the fraction of samples of the positive class that have actually been detected as such. For multi-class, it is calculated per class from the confusion matrix by dividing each diagonal element by the respective column sum.
+%     \item \ttt{'f1'} : the F1 score combines precision and recall into a single score given by the harmonic average $2*$\ttt{precision}$*$\ttt{recall} / (\ttt{precision} + \ttt{recall}).
+%     \item \ttt{'tval'}: for two classes, calculates the t-test statistic for the unequal sample size, equal variance case, based on decision values. This metric can be useful as a first step for a subsequent second-level analysis across participants.
+%     \item \ttt{'none'}: If \ttt{cfg.metric = 'none'}, then no metric is being calculated. Instead, a cell array with the raw classifier outputs for all test sets is returned.
+% \end{itemize}
+
+\begin{table}[]
+\begin{tabularx}{\textwidth}{llX}
+ Metric &  Range & Description   \\\hline
+ accuracy  &  [0,1] &  Fraction correctly predicted class labels.\\
+ AUC & [0,1] & For two classes only. Area under the ROC curve (AUC) is an alternative to classification accuracy. More robust than accuracy to imbalanced classes. It requires continuous output from the classifier (decision values or probabilities). 0.5 means chance-level performance and 1 means perfect separation of the classes. \\
+ confusion & [0,1] &  Confusion matrix. Rows corresponds to true class, columns  to predicted class. The $(i,j)$-th element gives the proportion of samples of class i that have been classified as class j.\\
+ dval & [$-\infty,+\infty$] & For two classes only. Average decision value, for each class separately.\\
+ precision (PR) & [0,1] & TP / (TP + FP). Fraction of samples labelled as positive (+1) that actually belong to the positive class. For multi-class, it is calculated per class from the unnormalised confusion matrix.\\
+recall (R) & [0,1] & TP / (TP + FN). Fraction of positive samples that have been detected. For multi-class, it is calculated per class from the confusion matrix.\\
+F1 & [0,1] & Combines precision and recall into a single score using the harmonic average 2*PR*R / (PR+R).\\
+tval & [$-\infty,+\infty$] & For two classes. T-test statistic for the unequal sample size, equal variance case, based on decision values.\\
+none & [$-\infty,+\infty$] & Returns a cell array with the raw classifier outputs for all test sets.
+\end{tabularx}
+\caption{Metrics in MVPA-Light. Abbreviations: TP = true positives, FP = false positives, FN = false negatives.}
+\label{tab:metrics}
+\end{table}
 
 If cross-validation is used then the metric is initially calculated for each test set in each repetition separately. It is then averaged across test sets and repetitions. Since the number of samples in a test set can vary a proportionally weighted average is used whereby larger test sets get a larger weight.
 
@@ -510,10 +527,11 @@ Apart from the \ttt{main} branch intended for general use, the GitHub repository
 To illustrate MVPA-Light on a real dataset, in this section a multivariate analysis of the multisubject, multimodal face processing by \citep{Wakeman2015ADataset,Wakeman2014OpenfMRI} will be conducted. The dataset contains 16 participants with EEG and MEG simultaneously recorded. Refer to  \cite{Wakeman2015ADataset} for details on the collected data. The MEEG data was preprocessed using FieldTrip. It was low-pass filtered with a cut-off of 100 Hz, high-pass filtered with a FIR one-pass zero-phase filter with a cut-off of 0.1 Hz. A bandstop filter was applied at 50 Hz to suppress line noise. Furthermore, data was downsampled to 220 Hz and for each subject, the 6 separate runs were combined into a single dataset, yielding 880--889 trials per subject with roughly equal proportions for the three classes. All trials displaying famous faces were coded as class 1, familiar faces as class 2, and scrambled faces as class 3. MVPA was performed to answer the following questions:
 
 \begin{enumerate}
-    \item \cite{Wakeman2015ADataset} found two prominent ERP components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier will be used to investigate which kind of discriminative information is contained in both ERP/ERF components.
+    \item ERP classification: \cite{Wakeman2015ADataset} found two prominent ERP components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier will be used to investigate which kind of discriminative information is contained in both ERP/ERF components.
+    \item Time classification: Is there more discriminative information in MEG than in EEG? Compare ERP classification across time for EEG, MEG and EEG+MEG combined. 
     \item To investigate whether both ERP/ERF components reflect similar representations, time generalisation (time x time classification) will be used.
     \item Is the discriminative information for famous vs scrambled faces confined to specific oscillatory frequencies and times? To this end classification will be performed for each time-frequency point separately. Furthermore, frequency x frequency classification will be used to investigate whether 
-    \item Is there more discriminative information in MEG than in EEG? Compare ERP classification across time for EEG, MEG and EEG+MEG combined. 
+
 \end{enumerate}
 
 In all analyses, MVPA was performed at the sensor level. Performed MVPA at the sensor level ... and time-frequency analysis
@@ -524,7 +542,7 @@ In all analyses, MVPA was performed at the sensor level. Performed MVPA at the s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Results}
 
-\todo{report results}
+\prettyref{fig:results} depicts the results of the classificatin analysis. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- DISCUSSION --------   %%
