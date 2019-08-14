@@ -111,7 +111,7 @@
 
 %%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
 \section{}
-MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automatised. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalisation (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
+MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, kernel FDA, Naive Bayes, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automated. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalisation (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
 
 
 
@@ -193,10 +193,10 @@ In the next section, the toolbox will be described in more detail and an classif
 %%% -----------------------------
 \subsection{High-level interface}
 
-
+The structure of the toolbox is depicted in \prettyref{fig:structure}. 
 The toolbox can be interacted with high-level functions that cover many common classification tasks. \ttt{mv\_crossvalidate} performs a single cross-validation analysis on a 2-D [samples $\times$ features] dataset \ttt{X}. The next two functions, \ttt{mv\_classify\_across\_time}  and \ttt{mv\_classify\_timextime}, assume that the data has a time dimension as well, i.e. it is a 3-D [samples $\times$ features $\times$ time points] array. \ttt{mv\_classify\_across\_time} performs classification for every time point, resulting in a vector of cross-validated metrics (e.g. accuracy), the length of the vector being the number of time points. In contrast, \ttt{mv\_classify\_timextime} implements time generalization \citep{King2014}, that is, classification for every combination of training and test time points, resulting in a 2-D matrix of cross-validated metrics. \ttt{mv\_searchlight}  performs classification for every feature (e.g. EEG channels) separately, resulting in a vector of cross-validated metrics, the length of the vector being the number of features (e.g. channels). This is useful for identifying the spatial location of discriminative information. Lastly, \ttt{mv\_classify} is a more general-purpose function that works on data of arbitrary dimension (e.g. time-frequency data). It combines the capabilities of all the other high-level functions at the expense, to some extent, of ease and speed.
 
-All high-level functions take the three input arguments depicted in \prettyref{fig:X}. First, \ttt{cfg}, a configuration structure wherein hyperparameters for the analysis can be set. Second, \ttt{X}, the input data array of appropriate dimension. Third, \ttt{clabel}, a vector of class labels.
+All high-level functions take the three input arguments. First, \ttt{cfg}, a configuration structure wherein hyperparameters for the analysis can be set. Second, \ttt{X}, the input data array of appropriate dimension. Third, \ttt{clabel}, a vector of class labels.
 Some of the parameters in the \ttt{cfg} struct are common  to all high-level functions:
 
 \begin{itemize}
@@ -620,10 +620,10 @@ The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org
 %%% If using *.tif files convert them to .jpg or .png
 %%%  NB logo1.eps is required in the path in order to correctly compile front page header %%%
 
-\begin{figure}[ht!]
-\centering\includegraphics[width=.6\linewidth]{X_clabel_cfg}
-\caption{The three most commonly used input arguments in MVPA-Light. Colours are used to represent the two classes 1 (turquoise) and 2 (red) for illustrative purposes. Note that \textbf{X} can be three-dimensional (e.g. if it also has a time dimension) or even higher-dimensional (e.g. time-frequency data).}\label{fig:X}
-\end{figure}
+% \begin{figure}[ht!]
+% \centering\includegraphics[width=.6\linewidth]{X_clabel_cfg}
+% \caption{The three most commonly used input arguments in MVPA-Light. Colours are used to represent the two classes 1 (turquoise) and 2 (red) for illustrative purposes. Note that \textbf{X} can be three-dimensional (e.g. if it also has a time dimension) or even higher-dimensional (e.g. time-frequency data).}\label{fig:X}
+% \end{figure}
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{fig1_MVPA_structure}
