@@ -111,7 +111,7 @@
 
 %%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
 \section{}
-MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, kernel FDA, Naive Bayes, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automated. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalisation (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
+MVPA-Light is an easy to use MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of Linear Discriminant Analysis, Logistic Regression, Support Vector Machines, kernel FDA, Naive Bayes, and ensemble methods, using modern optimisation algorithms. The selection of regularisation hyperparameters is largely automated. High-level functions allow for the classification of time, frequency, or time-frequency data, including generalization (e.g. time x time) and searchlight analysis. A variety of classification metrics are calculated using cross-validation with support for hyperparameter grid search (nested cross-validation) and nested preprocessing. The toolbox is modular, easily extendable, and is shipped with sample data and example scripts. Additionally, it offers interfaces for LIBSVM, LIBLINEAR as well as an integration into the FieldTrip toolbox.
 
 
 
@@ -136,7 +136,7 @@ A number of excellent MATLAB toolboxes for MVPA has been developed over the year
 \item \textit{transparent}: the toolbox has a shallow code base with well-documented functions. In many cases, the function call stack has a depth of two within the toolbox. For instance, a call to \texttt{mv\_crossvalidate} using an LDA classifier triggers calls to functions such as  \texttt{mv\_check\_inputs}, \texttt{train\_lda} and \texttt{test\_lda}. Although the train/test functions might call additional optimisation functions, most of the work is done at these two shallowest levels. To preserve the shallowness, high-level functions replicate code that might be shared otherwise. Furthermore, object orientation and encapsulation is avoided in favour of the more transparent MATLAB structs.
 \item \textit{fast}: all classifiers and high-level function are written with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, LR and SVM use iterative optimisation algorithms written in MATLAB. However, these algorithms run substantially faster using compiled code. To this end, an interface is provided for LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008}, two excellent C implementations of LR and SVM for users who do not shy away from compiling the code on their platform.
 \item \textit{modular and pluggable}: it is possible, and intended, to harvest parts of the code such as the classifiers for other purposes. It is also easy to plug the toolbox into a larger EEG/MEG processing framework. The fact that the toolbox does not use its own data format contributes to its 'pluggability'. All input data are just matrices and class labels come as vectors. This avoids the need for conversion functions that translate between different data formats. An interface for FieldTrip \citep{Oostenveld2011} has been provided with relatively little effort as described in the Methods section.
-\item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalisation including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparamaters required by classifiers can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox. In addition to this, each classifier has its own train and test functions. This allows for direct, low-level access to the classifiers. 
+\item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalization including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparamaters required by classifiers can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox. In addition to this, each classifier has its own train and test functions. This allows for direct, low-level access to the classifiers. 
 \end{itemize}
 
 It is worth noting that MVPA-Light is a purely statistical toolbox. That is, it assumes that data has been preprocessed with a neuroimaging toolbox and comes in the shape of MATLAB arrays. Many toolboxes (e.g. FieldTrip, SPM, EEGLAB) store the imaging  data in such arrays, so that MVPA-Light can easily be used as a plugin tool. This comes with the perk that adaptation to other imaging modalities such as NIRS and fMRI is straightforward.
@@ -150,7 +150,7 @@ It is worth noting that MVPA-Light is a purely statistical toolbox. That is, it 
 %     \item Tuning: toolboxes that support hyperparameter tuning might require ... nested cross-validation, that is, a cross-validation needs to be performed within each training set to identify the best set of hyperparameters.
 %     \item Preprocessing : ... preprocessing within cross-validation folds ...
 %     \item Multi-dimensional: ... whether the toolbox supports the processing of higher dimensional data
-%     \item Time generalisation: ...
+%     \item Time generalization: ...
 %     \cite{King2014}
 %     \item Searchlight: indicates whether the toolbox has a high-level interfaces for searchlight analysis, wherein features (e.g. channels) ...
 %     \item Metrics
@@ -243,9 +243,9 @@ adds a preprocessing pipeline that perfoms undersampling of the data followed by
 % Many neuroimaging datasets have a 3-D structure (trials x channels x time). The start of the trial (t=0) typically corresponds to stimulus or response onset. Classification across time can help identify at which time point in a trial discriminative information shows up. To this end, classification is performed across trials, for each time point separately. This is implemented in the function \ttt{mv\_classify\_across\_time}. It returns classification performance calculated for each time point in a trial.
 
 
-% \subsubsection{Time generalisation: \ttt{mv\_classify\_timextime}}
+% \subsubsection{Time generalization: \ttt{mv\_classify\_timextime}}
 
-% Classification across time does not give insight into whether information is shared across different time points. For example, is the information that the classifier uses early in a trial (t=80 ms) the same that it uses later (t=300ms)? This question can be answered by training the classifier at t=80ms and testing it at t=300ms, and vice versa. Repeating this analysis for every possible combination of training time point and testing time point yields a [training time points $\times$ testing time points] matrix of classification results. In the literature, this kind of analysis is also known as time generalisation \cite{King2014}. The function  \ttt{mv\_classify\_timextime} implements time generalisation. It returns a 2D matrix of classification performance, with performance calculated for each combination of training time point and testing time point.
+% Classification across time does not give insight into whether information is shared across different time points. For example, is the information that the classifier uses early in a trial (t=80 ms) the same that it uses later (t=300ms)? This question can be answered by training the classifier at t=80ms and testing it at t=300ms, and vice versa. Repeating this analysis for every possible combination of training time point and testing time point yields a [training time points $\times$ testing time points] matrix of classification results. In the literature, this kind of analysis is also known as time generalization \cite{King2014}. The function  \ttt{mv\_classify\_timextime} implements time generalization. It returns a 2D matrix of classification performance, with performance calculated for each combination of training time point and testing time point.
 
 % \subsubsection{Searchlight analysis:  \ttt{mv\_searchlight}}
 
@@ -254,9 +254,9 @@ adds a preprocessing pipeline that perfoms undersampling of the data followed by
 
 % \subsubsection{Classification of multi-dimensional data: \ttt{mv\_classify}}
 
-% In some cases, a dataset can have more than 3 dimensions. An obvious example is time-frequency data which is 4-dimensional, e.g. samples $\times$ channels  $\times$ frequencies $\times$ time points. Even more complex datasets using e.g. connectivity data are easily conceivable. Furthermore, it is conceivable that the user wants to analyse the data in different ways. For instance, time-frequency example, one user may want a two-dimensional classification result obtained for each time/frequency point, using the channels as features. In other cases, it may be desirable to perform a time x time analysis, using both channels and frequencies as features, or a frequency x frequency analysis, using channels and time points as features. Clearly, a more flexible function is required that works with arbitrary data dimensionality and that allows for the designation of dimensions to be treated as features, for searchlight, or for generalisation.
+% In some cases, a dataset can have more than 3 dimensions. An obvious example is time-frequency data which is 4-dimensional, e.g. samples $\times$ channels  $\times$ frequencies $\times$ time points. Even more complex datasets using e.g. connectivity data are easily conceivable. Furthermore, it is conceivable that the user wants to analyze the data in different ways. For instance, time-frequency example, one user may want a two-dimensional classification result obtained for each time/frequency point, using the channels as features. In other cases, it may be desirable to perform a time x time analysis, using both channels and frequencies as features, or a frequency x frequency analysis, using channels and time points as features. Clearly, a more flexible function is required that works with arbitrary data dimensionality and that allows for the designation of dimensions to be treated as features, for searchlight, or for generalization.
 
-% It is worth pointing out that \texttt{mv\_classify} is a general-purpose function that is a generalisation of \texttt{mv\_searchlight}, \texttt{mv\_classify\_across\_time}, and \texttt{mv\_classify\_timextime}. In other words, any of these functions actions can be 'simulated' using \texttt{mv\_classify}.
+% It is worth pointing out that \texttt{mv\_classify} is a general-purpose function that is a generalization of \texttt{mv\_searchlight}, \texttt{mv\_classify\_across\_time}, and \texttt{mv\_classify\_timextime}. In other words, any of these functions actions can be 'simulated' using \texttt{mv\_classify}.
 
 %%% -----------------------------
 %%% -------- CLASSIFIERS --------
@@ -310,7 +310,7 @@ Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class 
 \w_{\text{lda}} = \S_w^{-1}\ (\m_1 - \m_2)
 \end{equation}
 
-For multiple classes, there is multiple vectors $\w_{\text{lda}}$. They are collected in a matrix $\W\in\R^{P\times(C-1)}$ and scaled such that $\W^\top\S_w\W = \I$ \citep{Bishop2007}. $\W$ can be obtained via the generalised eigenvalue problem
+For multiple classes, there is multiple vectors $\w_{\text{lda}}$. They are collected in a matrix $\W\in\R^{P\times(C-1)}$ and scaled such that $\W^\top\S_w\W = \I$ \citep{Bishop2007}. $\W$ can be obtained via the generalized eigenvalue problem
 
 \begin{align}
 \label{eq:LDA-eigenvalue-multiclass}
@@ -529,20 +529,24 @@ To illustrate MVPA-Light on a real dataset, in this section a multivariate analy
 \begin{enumerate}
     \item ERP classification: \cite{Wakeman2015ADataset} found two prominent ERP components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier will be used to investigate which kind of discriminative information is contained in both ERP/ERF components.
     \item Time classification: Is there more discriminative information in MEG than in EEG? Compare ERP classification across time for EEG, MEG and EEG+MEG combined. 
-    \item To investigate whether both ERP/ERF components reflect similar representations, time generalisation (time x time classification) will be used.
+    \item To investigate whether both ERP/ERF components reflect similar representations, time generalization (time x time classification) will be used.
     \item Is the discriminative information for famous vs scrambled faces confined to specific oscillatory frequencies and times? To this end classification will be performed for each time-frequency point separately. Furthermore, frequency x frequency classification will be used to investigate whether 
 
 \end{enumerate}
 
-In all analyses, MVPA was performed at the sensor level. Performed MVPA at the sensor level ... and time-frequency analysis
-
+In all analyses, MVPA was performed at the sensor level using a LDA classifier. The analysis script is available in github.com/treder/MVPA-Light-Paper.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- RESULTS --------   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Results}
 
-\prettyref{fig:results} depicts the results of the classificatin analysis. 
+\prettyref{fig:results} depicts the results of the MVPA, averaged across subjects. The numbers in the headings correspond to the numbers of the research questions. Errorbars depict standard error across subjects.
+
+\textit{ERP classification}. .... bar graph shows that both ... For three classes, chance level is 33\%, ... clasification accuracy is significantly above ... To further elucidate the relationship between the three classes in terms of information content, confusion matrices are depicted for the N170 and sustained ERP component. In both cases, highest accuracy is obtained for the scrambled images. Moreover, ... misclassification (off-diagonal elements), famous and unfamiliar faces are often confused for one another. This is not suprising since both are nearly identical in terms of low-level features. 
+
+\textit{Time classification}. Results shows classification across time for famous vs scrambled images for the three channel sets. The classes are not discriminable prior to the occurence of the N170. 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- DISCUSSION --------   %%
