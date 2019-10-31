@@ -172,6 +172,11 @@ In the next section, the toolbox will be described in more detail and an classif
 %%% ------------------------
 \section{Materials and methods}
 
+\red{\subsection{Requirements}}
+
+A standard Desktop or Laptop is sufficient to run MVPA-Light. The memory requirement is mostly dictated by the size of the dataset. Some functions operate on a copy of the data. It is therefore recommended that the available RAM exceeds the size of the dataset by at least a factor of two (e.g. 4+ GB RAM for a 2 GB dataset). MVPA-Light is supported by MATLAB 2012a and more recent versions. The Statistics toolbox is required at some points in the toolbox (e.g. for calculating t-values). The cluster permutation test in \ttt{mv\_statistics} uses the Image Processing toolbox to extract the clusters. No other toolboxes are required. 
+
+
 %%% -----------------------------
 %%% --- HIGH-LEVEL FUNCTIONS ----
 %%% -----------------------------
@@ -210,7 +215,7 @@ To obtain a realistic estimate of classification or regression performance and c
 
 Hyperparameters are parameters describing a classifier or regression model that need to be specified by the user, such as the type and amount of regularization applied, the type of kernel, and the kernel width $\gamma$ for Gaussian kernels. From the user's perspective, hyperparameters can be nuisance parameters: it is sometimes not clear a priori how to set them, but their exact value can have a substantial effect on the result.
 
-MVPA-Light tries to automate hyperparameter selection as much as possible. This is done using either reasonable default values, hyperparameter estimators (e.g., \cite{Ledoit2003HoneyMatrix} for LDA) or the use of  hyperparameter-free regularizers (log-F(1,1) for Logistic Regression). If this is not possible, automated grid search using nested cross-validation can be used for testing out different hyperparameter combinations essentially by brute force. For better performance, hyperparameter tuning is implemented within each classifier's train function, rather than using a generic tuning function.
+MVPA-Light tries to automate hyperparameter selection as much as possible. This is done using either reasonable default values, hyperparameter estimators (e.g., \cite{Ledoit2003HoneyMatrix} for LDA) or the use of  hyperparameter-free regularizers (log-F(1,1) for Logistic Regression). If this is not possible, automated grid search using nested cross-validation can be used for testing out different hyperparameter combinations essentially by brute force. \red{For better performance, bespoke hyperparameter tuning functions are implemented for some classifiers. Otherwise, the generic tuning function \ttt{mv\_tune\_hyperparameters} is used.}
 
 %%% ------- PREPROCESSING -------
 \subsubsection{Preprocessing}\label{sec:preprocessing}
@@ -485,6 +490,23 @@ Regression & MAE  & [$0,\infty$) &  Mean absolute error: $1/n \sum_{i=1}^n|y_i -
 
 If cross-validation is used then the metric is initially calculated for each test set in each repetition separately. It is then averaged across test sets and repetitions. Since the number of samples in a test set can vary across different folds, a proportionally weighted average is used whereby larger test sets get a larger weight.
 
+%%% ---------------------------------
+%%% ----   STATISTICS   ----
+%%% ---------------------------------
+\red{\subsection{Statistical analysis}\label{sec:statistics}}
+
+In many neuroimaging experiments, establishing the statistical significance of a classification or regression metric is more important than maximizing the metric per se. The function \ttt{mv\_statistics} implements both Level 1 (single-subject) and Level 2 (group leve) statistical analyses of MVPA data. For Level 1 analysis, the following tests are available:
+
+\begin{itemize}
+    \item Binomial test: uses a binomial distribution to calculate the p-value under the null hypothesis that classification accuracy is at chance level. Requires classification accuracy as metric.
+    \item Permutation test: non-parametric significance test. Creates a null distribution by shuffling the class labels of response vector and repeating the classification analysis e.g. 1000 times. 
+    \item Cluster permutation test: an elegant solution to the multiple comparisons problems arising when MVPA has been performed along multiple dimensions (e.g. for each time-frequency point). Uses the cluster statistic introduced in 
+    \cite{Maris2007}.
+\end{itemize}
+
+For Level 2 analysis, a permutation test (with and without cluster correction) is available for within-subject and between-subject design.
+
+
 \subsection{Custom classifiers and regression models}
 
 MVPA-Light can easily be extended with custom models. To this end, the appropriate train and test functions need to be implemented. Additionally, default hyperparamaters need to be added to the function \ttt{mv\_get\_hyperparameter}. In the appendix, it is shown how to implement a prototype classifier that assigns a sample to the closest class centroid.
@@ -515,7 +537,15 @@ To illustrate MVPA-Light on a real dataset, a multivariate analysis is conducted
     \item Generalization: Are representations shared across time \citep{King2014} or frequency? To answer this, time generalization (time x time classification) is applied to the ERF data, and frequency generalization (frequency x frequency classification) is applied to the time-frequency data.
 \end{enumerate}
 
-MVPA is performed at the sensor level using a LDA classifier. All analyses are cross-validated using 5-fold or 10-fold cross-validation. Only the MEG channels are used as features except for analysis 2, where different sets of channels are compared. All scripts used for the analysis are available in the accompanying GitHub repository \footnote{https://github.com/treder/MVPA-Light-Paper}.
+MVPA is performed at the sensor level using a LDA classifier. All analyses are cross-validated using 5-fold or 10-fold cross-validation. Only the MEG channels are used as features except for analysis 2, where different sets of channels are compared. The statistical significance for some of these results was assessed as follows
+
+\begin{itemize}
+    \item Level 1 analysis (first subject only) based on the time generalization results for subject 1 contrasting famous vs scrambled faces using the EEG channels only. Classification accuracy is used as a metric. Three statistical tests are compared: binomial, permutation, and cluster permutation tests. Both permutation tests are based on 500 permutations of the class labels. Only the cluster permutation test has been corrected for multiple comparisons by using a cluster statistic. A cut-off value of 0.6 for accuracy is chosen for the cluster statistic. 
+    \item Level 2 analysis (across subjects). 
+    
+\end{itemize}
+
+All scripts used for the analysis are available in the accompanying GitHub repository \footnote{https://github.com/treder/MVPA-Light-Paper}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- RESULTS --------   %%
@@ -533,6 +563,9 @@ MVPA is performed at the sensor level using a LDA classifier. All analyses are c
 \textit{Generalization}. The first plot depicts AUC (color-coded) as a function of the training time (y-axis) and testing time (x-axis). There is evidence for widespread time generalization starting about at the time of the N170 peak and covering most of the remaining trial. In particular, there is generalization between the N170 and the later sustained component (horizontal and vertical lines emanating at 0.17 s), suggesting some correlation between the spatial pattern of the N170 and the sustained component. 
 The second plot depicts AUC as a function of frequency. The is some generalization in the theta band (lower-left corner), the alpha band, and the lower beta band (16--22 Hz). Also, when the classifier is trained in the beta band, classification performance partially generalizes to the alpha band. However, the overall performance is low when compared to the time-locked data. 
 
+\red{\textit{Level 1 statistical analysis}. Images depict the AUC values masked by whether or not a time-time point is significant according to each of the three tests. Both uncorrected tests (binomial and permutation test) exhibit spurious effects even at pre-stimulus time. The cluster permutation test seems to robustly identify a contiguous cluster that discriminates between the two classes.}
+
+\red{\textit{Level 2 statistical analysis}. Group statistical analysis of the time-frequency classification data. A within-subjects design was used contrasting the AUC against the chance level of 0.5. The }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- DISCUSSION --------   %%
