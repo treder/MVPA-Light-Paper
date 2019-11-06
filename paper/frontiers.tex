@@ -542,13 +542,26 @@ MVPA is performed at the sensor level using a LDA classifier. All analyses are c
     
 \end{itemize}
 
-All scripts used for the analysis are available in the accompanying GitHub repository \footnote{https://github.com/treder/MVPA-Light-Paper}.
+\red{\subsection{Analysis of a fMRI dataset}}
+To illustrate MVPA-Light applied to fMRI data, another analysis was conducted using the dataset by \cite{Haxby2001}. It the BOLD time series of 6 participants viewing images from 8 types of classes. The dataset was downloaded from \ttt{http://www.pymvpa.org/datadb/haxby2001.html}. The only preprocessing step applied was the application of a zero-phase Butterworth high-pass filter with a cut-off frequency of 0.01 Hz in order to remove slow drifts of the voxel time series.
+
+\begin{enumerate}
+    \item Confusion matrix: Which types of images cause similar brain activation patterns?
+    \item Time classification: How does classification performance evolve across time following stimulus onset?
+    \item Searchlight analysis: Which of the brain regions contains discriminative information to discern between faces vs houses?
+\end{enumerate}
+
+Eight sessions were recorded for every subject. Leave-one-session-out cross-validation was used to calculate classification performance. LDA with automatic shrinkage regularization was used as a classifier.
+
+
+The scripts used in both analyses are available in the accompanying GitHub repository \footnote{https://github.com/treder/MVPA-Light-Paper}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- RESULTS --------   %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Results}
 
+\subsubsection{MEEG data}
 \prettyref{fig:results} depicts the results of the MVPA, averaged across subjects. The numbers in the headings correspond to the numbers of the research questions. Errorbars depict standard error across subjects.
 
 \textit{ERP classification}. The bar graph shows that for both the N170 and the sustained ERP component classification accuracy is significantly above the chance level of 33\%. Accuracy is a summary measure that can be broken down into confusion matrices that show which combinations of classes get misclassified ('confused'). For both N170 and the sustained ERP component, the highest accuracy is obtained for the scrambled images. Moreover,  misclassification (off-diagonal elements) is most prominent for the famous and unfamiliar faces. This is not surprising since both types of images are identical in terms of low-level features and both show actual faces, in contrast to the scrambled images. 
@@ -564,6 +577,21 @@ The second plot depicts AUC as a function of frequency. The is some generalizati
 
 \red{\textit{Level 1 statistics}. Images depict the AUC values masked by significance. Both uncorrected tests (binomial and permutation test) exhibit spurious effects even at pre-stimulus time. Most of these spurious effects disappear under the cluster permutation test.}
 
+\red{\subsubsection{fMRI data}}
+
+\prettyref{fig:fmri_results} depicts the results of the MVPA on the fMRI data, averaged across subjects. The numbers in the headings correspond to the numbers of the research questions. Errorbars depict standard error across subjects.
+
+\textit{Confusion matrix}. The bar graph shows that for both the N170 and the sustained ERP component classification accuracy is significantly above the chance level of 33\%. Accuracy is a summary measure that can be broken down into confusion matrices that show which combinations of classes get misclassified ('confused'). For both N170 and the sustained ERP component, the highest accuracy is obtained for the scrambled images. Moreover,  misclassification (off-diagonal elements) is most prominent for the famous and unfamiliar faces. This is not surprising since both types of images are identical in terms of low-level features and both show actual faces, in contrast to the scrambled images. 
+
+\textit{Time classification}. AUC is plotted as a function of time for famous vs scrambled images. The classification was repeated for the three channel sets. The classes are not discriminable prior to the occurrence of the N170. A classification peak at the time of the N170 can be seen for all channel sets. At this stage, the AUC values diverge, with EEG yielding a significantly lower AUC. Combining EEG+MEG seems to yield slightly higher performance than MEG alone.
+
+\textit{Searchlight analysis}. AUC is plotted as a function of both time and frequency. The AUC values are color-coded. For famous vs scrambled faces, peak performance is reached in the delta frequency band at a latency between 0.2 and 0.4 s. For famous vs unfamiliar faces, peak performance is attained in the latter half of the trial (0.5 - 1 s) in the theta and alpha frequency bands. 
+
+\textit{Level 1 statistics}. Images depict the AUC values masked by significance. Both uncorrected tests (binomial and permutation test) exhibit spurious effects even at pre-stimulus time. Most of these spurious effects disappear under the cluster permutation test.
+
+\red{\subsubsection{Benchmarking}}
+
+\todo{add results for benchmark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- DISCUSSION --------   %%
@@ -574,6 +602,10 @@ MVPA-Light offers a suite of classifiers, regression models and metrics for mult
 
 % Wakeman & Henson analysis
 To showcase some of the features of the toolbox, an analysis of the \cite{Wakeman2015ADataset} dataset has been reported. The results, depicted in \prettyref{fig:results}, illustrate some ways in which the toolbox can aid in quantifying the similarity of representations, measuring the information content in EEG/MEG, localizing discriminative information in the time-frequency plane, highlighting shared representations across different time points or frequencies, and establishing statistical significance.
+
+\todo{discuss fMRI analysis}
+
+\todo{discuss benchmarking}
 
 % Preprocessing
 The toolbox also provides a nested preprocessing pipeline that applies operations to train and test sets separately. Among others, it features over- and undersampling, PCA, and scaling operations. It also includes an averaging approach wherein samples are assigned to groups and then averaged in order to increase signal-to-noise ratio. For linear classifiers, this approach has been explored by \citep{Cichy2015,Cichy2017MultivariateSpace}. Recently, it has been generalized to non-linear kernel methods \citep{Treder2018}. Either approach can be used in the toolbox by adding the operation \ttt{average\_samples} or \ttt{average\_kernel} to the preprocessing pipeline. 
@@ -714,7 +746,7 @@ The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{fig1_MVPA_structure}
-\caption{Structure of the toolbox.}\label{fig:structure}
+\caption{Structure of MVPA-Light.}\label{fig:structure}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -729,7 +761,13 @@ The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{MVPA_results}
-\caption{Results for the classification analysis of the \cite{Wakeman2015ADataset} data.}\label{fig:results}
+\caption{Results for the classification analysis of the \cite{Wakeman2015ADataset} MEEG data.}\label{fig:results}
+\end{figure}
+
+
+\begin{figure}[ht!]
+\centering\includegraphics[width=\linewidth]{fmri_results}
+\caption{Results for the classification analysis of the \cite{Haxby2001} fMRI data.}\label{fig:fmri_results}
 \end{figure}
 
 %%% If you are submitting a figure with subfigures please combine these into one image file with part labels integrated.
