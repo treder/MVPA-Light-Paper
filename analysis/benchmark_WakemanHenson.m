@@ -1,5 +1,7 @@
-% Performs benchmarking, i.e. comparing the speed of training different
-% classifiers.
+% Performs benchmarking on Wakeman & Henson data:
+% - out of the box classification performance (using classifiers with their
+%   default settings)
+% - computational speed: how long does it take to train the classifier 
 %
 % Tested with:
 % Dataset: Wakeman and Henson 1.0.3, downloaded from https://openneuro.org/datasets/ds000117/versions/1.0.3
@@ -13,247 +15,44 @@ preprocdir  = [rootdir 'preprocessed/'];
 resultsdir  = [rootdir 'results/'];
 figdir      = [rootdir 'figures/'];
 
-nsubjects  = 16;
+% Load class labels (saved in classify_WakemanHenson.m)
+load([resultsdir 'classification_analysis'],'nsubjects','clabels')
 
-% Cell arrays for collecting all results across subjects
-cf = cell(nsubjects, 2);   % keeps the classifier 
-Xs = cell(nsubjects, 2);   
-do_plot = 0;
-
-classifiers = {'lda' 'logreg' 'naive_bayes' 'svm' 'kernel_fda' 'libsvm' ...
+classifiers_light = {'lda' 'logreg' 'naive_bayes' 'svm' 'kernel_fda' 'libsvm' ...
     'liblinear'};
 
+classifiers_matlab = {'lda' 'logreg' 'naive_bayes' 'svm' 'kernel_fda' 'libsvm' ...
+    'liblinear'};
+
+% meeg_accuracy = 
+meeg_acc = cell(numel(classifiers), 1);
 meeg_time = cell(numel(classifiers), 1);
-eeg_time = cell(numel(classifiers), 1);
-meg_time = cell(numel(classifiers), 1);
 
-%% TODO ---
-
-for nn=1:nsubjects     % --- loop across subjects
+for n=1:nsubjects     % --- loop across subjects
     
-    %% Load data
-    fprintf('**** loading subject #%d\n', nn)
-    load([preprocdir 'sbj-' num2str(nn)],'dat')
+    
+    %% Load MEEG data
+    fprintf('**** loading subject #%d\n', n)
+    load([preprocdir 'sbj-' num2str(n)],'dat')
     
     % bring trials from cell array into matrix form
     cfg = [];
     cfg.keeptrials  = 'yes';
     cfg.covariance  = 'yes';
-	meeg = ft_timelockanalysis(cfg, meeg);
+	dat = ft_timelockanalysis(cfg, dat);
 
-    meeg = scale_MEEG(meeg);
-
-    % MEG only
+    dat = scale_MEEG(dat);
+    
+    % MEG
     cfg = [];
     cfg.channel = 'MEG';
-	meg= ft_selectdata(cfg, meeg);
+	meg= ft_selectdata(cfg, dat);
     
-    % EEG only
-    cfg = [];
-    cfg.channel = 'EEG';
-	eeg= ft_selectdata(cfg, meeg);
+    %% Out of the box classification
     
-    %% Define class labels
-    clabel = meg.trialinfo;
-    % recode the classes by collapsing initial/immediates/delayed
-    % triggers to one class such that
-    % 1 = FAMOUS
-    % 2 = UNFAMILIAR
-    % 3 = SCRAMBLED
-    clabel(ismember(clabel,[5,6,7])) = 1;
-    clabel(ismember(clabel,[13,14,15])) = 2;
-    clabel(ismember(clabel,[17,18,19])) = 3;
     
-    %% also create labels for binary classification (two classes)
-    % famous vs unfamiliar and famous vs scrambled faces
-    ix_famous_scrambled = (ismember(clabel, [1, 3]));
-    
-    cfg = [];
-    cfg.trials  = ix_famous_scrambled;
-    cfg.latency = [-0.1, 0.9];
-    meg_famous_scrambled = ft_selectdata(cfg, meg);
-    
-    clabel_famous_scrambled = clabel(ix_famous_scrambled);
-    
-    % for binary classification, recode scrambled (class 3) to class 2
-    clabel_famous_scrambled(clabel_famous_scrambled==3) = 2;
-    
-    erp_time = meg_famous_scrambled.time;
-    
-    %% Cross-validation for N170 and sustained ERP component 400-800 ms
-    N170_times = find( (meg.time > 0.15) & (meg.time < 0.2));
-    sustained_times = find( (meg.time > 0.4) & (meg.time < 0.8));
-
-    Xs{nn,1} = squeeze(mean(meg.trial(:,:,N170_times), 3));
-    Xs{nn,2} = squeeze(mean(meg.trial(:,:,sustained_times), 3));
-    
-    % MVPA-Light
-    cfg = [];
-    cfg.classifier      = 'multiclass_lda';
-    cfg.metric          = {'accuracy' 'confusion'};
-
-    [cf_cv{nn,1}, result_N170] = mv_crossvalidate(cfg, Xs{nn,1}, clabel);
-    [cf_cv{nn,2}, result_sus] = mv_crossvalidate(cfg, Xs{nn,2}, clabel);
-    
-    % call mv_plot_result for a quick visualisation of the results
-    if do_plot
-        mv_plot_result(result_N170)
-        mv_plot_result(result_sus)
-    end
-    
-    %%% Also keep the classifier trained on the full data on famouse vs
-    %%% scrambled
-    param = mv_get_hyperparameter('lda');
-    cf{nn,1} = train_lda(param, Xs{nn,1}(ix_famous_scrambled,:), clabel_famous_scrambled);
-    cf{nn,2} = train_lda(param, Xs{nn,2}(ix_famous_scrambled,:), clabel_famous_scrambled);
-
-    %% Classify time x time [time generalisation]
-    meg_famous_scrambled.trial = zscore(meg_famous_scrambled.trial);
-    
-    cfg = [];
-    cfg.classifier      = 'lda';
-    cfg.metric          = 'none';
-
-    [cf_time{nn}, result] = mv_classify_across_time(cfg, meg_famous_scrambled.trial, clabel_famous_scrambled);
-
-    if do_plot, mv_plot_result(result, meg_famous_scrambled.time, meg_famous_scrambled.time); end
-    
-    %% Perform time-frequency analysis using FieldTrip
-    cfg              = [];
-    cfg.output       = 'pow';
-    cfg.method       = 'mtmconvol';
-    cfg.taper        = 'hanning';
-    cfg.keeptrials   = 'yes';
-    cfg.foi          = 6:1:30;
-    cfg.t_ftimwin    = 5./cfg.foi;  % 5 cycles per time window
-    cfg.toi          = -0.2:0.02:1.1;
-    
-    ft_warning off
-    freq = ft_freqanalysis(cfg, meg);
-    
-    % reduce to famous vs scrambled
-    cfg = [];
-    cfg.trials  = ix_famous_scrambled;
-    cfg.latency = [-0.1, 1];
-    freq_fs= ft_selectdata(cfg, freq);
-    
-    cfg.trials  = ix_famous_familiar;
-    cfg.latency = [-0.1, 1];
-    freq_ff= ft_selectdata(cfg, freq);
-
-    freq_time = freq_fs.time;
-
-    %% Classification for each time-frequency point separately
-    % (the feature vector consists of the power at every MEG channel
-    % for a given time-frequency point)
-    cfg = [];
-    cfg.classifier      = 'lda';
-    cfg.metric          = 'auc';
-    cfg.repeat          = 2;
-    
-    % We will use the function mv_classify for classification of the
-    % time-frequency data. The function does not assume any specific order
-    % of the data dimensions. Hence, the user needs to specify which
-    % dimension codes for samples and which codes for the features. 
-    cfg.sample_dimension = 1;
-    cfg.feature_dimension  = 2;
-    % Dimensions 3 (frequency) and 4 (time) are not specified and will
-    % automatically be used as search/loop dimenions, so the result will be
-    % a [frequencies x times] matrix of AUC values
-    
-    % optional: provide the names of the dimensions for nice output
-    cfg.dimension_names = {'samples','channels','frequencies','time points'};
-    
-    % perform classification for famous vs scrambled and famous vs unfamiliar
-    cf_freq{nn,1} = mv_classify(cfg, freq_fs.powspctrm, clabel_famous_scrambled);
-    cf_freq{nn,2} = mv_classify(cfg, freq_ff.powspctrm, clabel_famous_familiar);
-    
-    % perf is now a 2-D [frequencies x times] matrix of AUC values
-    if do_plot
-        figure
-        mv_plot_2D(cf_freq{nn,1}, 'x', freq_fs.time, 'y', freq_fs.freq)
-        xlabel('Time'), ylabel('Frequency')
-        title('AUC for famous vs scrambled faces at each time-frequency point')
-        
-        figure
-        mv_plot_2D(cf_freq{nn,2}, 'x', freq_fs.time, 'y', freq_fs.freq)
-        xlabel('Time'), ylabel('Frequency')
-        title('AUC for famous vs unfamiliar faces at each time-frequency point')
-    end
-    
-    %% Frequency generalization [freq x freq classification]
-    % Here we will train on a specific frequency and test on another
-    % frequency. To this end, all channels x all time points will serve as
-    % features. 
-    % The result is a frequency x frequency plot of classification
-    % performance.
-
-    % Select just subset of the time points
-    cfg = [];
-    cfg.latency         = [0.7, 1];
-    freq_fs2 = ft_selectdata(cfg, freq_fs);
-
-    % Z-score to bring all time-frequency points on equal footing
-    freq_fs2.powspctrm = zscore(freq_fs2.powspctrm,[],1);
-    
-    cfg = [];
-    cfg.classifier              = 'lda';
-    cfg.metric                  = 'auc';
-    cfg.dimension_names         = {'samples','channels','frequencies','time points'};
-    
-    % Samples are still coded in dimension 1
-    cfg.sample_dimension  = 1;
-    % Now we want to use both dimension 2 (channels) and dimension 4 (time
-    % points) as features
-    cfg.feature_dimension  = [2, 4];
-    % Generalization is performed across dimension 3 (frequencies)
-    cfg.generalization_dimension = 3;
-    
-    % to be a bit faster, use 10-fold cross-validation with no extra repetitions
-    cfg.k               = 10;
-    cfg.repeat          = 1;
-
-    cf_freqxfreq{nn} = mv_classify(cfg, freq_fs2.powspctrm, clabel_famous_scrambled);
-    
-    if do_plot
-        figure
-        F = freq_fs2.freq;
-        mv_plot_2D(cf_freqxfreq{nn}, 'x', F, 'y', F)
-        xlabel('Test frequency [Hz]'), ylabel('Train frequency [Hz]')
-        title('Frequency generalization using channels-x-times as features')
-    end
-    
-    %% Perform analysis separately for EEG, MEG, and EEG+MEG
-    cfg = [];
-    cfg.trials  = ix_famous_scrambled;
-    cfg.latency = [-0.1, 0.9];
-    meeg = ft_selectdata(cfg, meeg);
-    
-    % Split into EEG and MEG channels
-    cfg = [];
-    cfg.channel  = 'EEG';
-    eeg = ft_selectdata(cfg, meeg);
-
-    cfg.channel  = 'MEG';
-    meg = ft_selectdata(cfg, meeg);
-    
-    cfg = [];
-    cfg.classifier      = 'lda';
-    cfg.metric          = 'auc';
-    
-    % to be a bit faster, use 10-fold cross-validation with no extra repetitions
-    cfg.k               = 10;
-    cfg.repeat          = 1;
-
-    [cf_meeg{nn,1}, result1] = mv_classify_across_time(cfg, eeg.trial, clabel_famous_scrambled);
-    [cf_meeg{nn,2}, result2] = mv_classify_across_time(cfg, meg.trial, clabel_famous_scrambled);
-    [cf_meeg{nn,3}, result3] = mv_classify_across_time(cfg, meeg.trial, clabel_famous_scrambled);
-
-    % Plot results together
-    if do_plot
-        mv_plot_result({result1, result2, result3}, meeg.time)
-        legend({'EEG', 'MEG', 'EEG+MEG'})
-    end
+    %% Timing 
+   
 end
 
 save([resultsdir 'classification_analysis'],'nsubjects',...
