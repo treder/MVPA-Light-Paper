@@ -267,17 +267,8 @@ stat_cluster = mv_statistics(cfg, res_searchlight{n}, face_house_bold{n}, clabel
 
 fprintf('Found %d significant clusters\n', sum(stat_cluster.p < 0.05))
 
-save([resultsdir 'Haxby_stat_cluster'], 'stat_cluster')
+% save([resultsdir 'Haxby_stat_cluster'], 'stat_cluster')
 
-
-%% Calculate mean anatomical image for displaying results
-anat = cell(1,5);
-for n=1:numel(anat)
-    tmp = ft_read_mri([rootdir sprintf('subj%d', n) '/anat.nii']);
-    anat{n} = double(tmp.anatomy);
-end
-
-anat = mean(cat(4, anat{:}),4);
 
 %% Plot cluster permutation test results
 n =  1;
