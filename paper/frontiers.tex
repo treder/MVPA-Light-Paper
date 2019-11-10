@@ -130,7 +130,7 @@ MVPA-Light is a MATLAB toolbox for multivariate pattern analysis (MVPA). It prov
 During the early 2010s, multivariate pattern analysis (MVPA) became a mainstream statistical tool in EEG/MEG research \citep{Blankertz2011,Lemm2011,Mur2009,Grootswagers2017DecodingData,Pereira2009,Varoquaux2017}. It can be considered as a complement to the set of traditional statistical tools available to researchers (e.g. t-test, ANOVA). MVPA is particularly suited to large, multivariate datasets. Furthermore, since many classifiers make few or no assumptions about the data distribution, and statistical significance is often established using permutation tests, MVPA can be considered as a set of non-parametric statistical tools.
 One of the primary applications of MVPA is \textit{classification}. In classification, an algorithm called \textit{classifier} takes a multivariate pattern of brain activity (referred to as \textit{features}) as input and maps it onto a categorical brain state or experimental condition (referred to as \textit{class label}). In other words, the task of a classifier is to predict class labels given features. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. It is worth noting that classification is often performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. \red{Another important application of MVPA is \textit{regression}. It shares many characteristics with classification, but it uses a \textit{regression model} to map features onto a continuous variable (e.g. reaction time) referred to a \textit{responses}. Consequently, predictions of the regression model are continuous  (e.g. predicted reaction time given a brain pattern).}
 
-A number of excellent MATLAB toolboxes for MVPA have been developed over the years, including the Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Berlin BCI toolbox \citep{Blankertz2016TheControl}, CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}, Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and The Decoding Toolbox (TDT) \citep{Hebart2015TheData}. Beyond MATLAB, the probably most popular computer languages for machine learning are Python and R, with outstanding toolboxes such as Scikit-learn \citep{Pedregosa2011Scikit-learn:Python} for Python and Caret \citep{Kuhn2008BuildingPackage} and MLR \citep{Bischl2000Mlr:R} for R. A comprehensive comparison of MVPA-Light with all these toolboxes is beyond the scope of this paper, but we believe that what sets MVPA-Light apart is the adherence to all of the following design principles: 
+A number of excellent MATLAB toolboxes for MVPA have been developed over the years, including the Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Berlin BCI toolbox \citep{Blankertz2016TheControl}, CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}, Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and The Decoding Toolbox (TDT) \citep{Hebart2015TheData}. Beyond MATLAB, the probably most popular computer languages for machine learning are Python and R, with outstanding toolboxes such as Scikit-Learn \citep{Pedregosa2011Scikit-learn:Python} for Python and Caret \citep{Kuhn2008BuildingPackage} and MLR \citep{Bischl2000Mlr:R} for R. A comprehensive comparison of MVPA-Light with all these toolboxes is beyond the scope of this paper, but we believe that what sets MVPA-Light apart is the adherence to all of the following design principles: 
 
 \begin{itemize}
 \item \textit{self-contained}: unlike many toolboxes that provide wrappers for existing classifiers, the backbone of MVPA-Light is  native implementations of various classifiers (LDA, kernel FDA, Logistic Regression, SVM, Naive Bayes and ensemble methods), regression models, and their corresponding optimization algorithms (Trust-Region Newton, Dual Coordinate Descent). As a result, MVPA-Light works out-of-the-box, without the need for additional toolboxes or  code compilation.
@@ -439,12 +439,12 @@ Ridge regression is used to analyze data that suffers from multicollinearity. Li
 \end{split}
 \end{align}
 
-where $\I_p\in\R^{p\times p}$ and $\I_p\in\R^{n\times n}$ are identity matrices. For $\lambda=0$ ridge regression reduces to ordinary least-squares regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger than $p$.
+where $\I_p\in\R^{p\times p}$ and $\I_p\in\R^{n\times n}$ are identity matrices. For $\lambda=0$ ridge regression reduces to ordinary least-squares regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger or smaller than $p$.
 
 %%% -------- KERNEL RIDGE --------
 \red{\subsubsection{Kernel ridge regression}}
 
-A kernelized version can be developed from the dual solution to ridge regression in a straightforward way. Let $\Phi:\mathcal{X}\mapsto\mathcal{F}$ be a map from input space to a Reproducing Kernel Hilbert Space, and $\Phi(\X) = [\phi(\x_1),\phi(\x_2),...,\phi(\x_n)]^\top$. Let $\K = \Phi(\X)\Phi(\X)^\top$ be the corresponding kernel matrix. Then the vector of dual weights is given by  
+A kernelized version can be developed from the dual solution to ridge regression in a straightforward manner. Let $\Phi:\mathcal{X}\mapsto\mathcal{F}$ be a map from input space to a Reproducing Kernel Hilbert Space, and $\Phi(\X) = [\phi(\x_1),\phi(\x_2),...,\phi(\x_n)]^\top$. Let $\K = \Phi(\X)\Phi(\X)^\top$ be the corresponding kernel matrix. Then the vector of dual weights is given by  
 
 \begin{align}
 \begin{split}
@@ -509,7 +509,7 @@ MVPA-Light can easily be extended with custom models. To this end, the appropria
 
 \subsection{LIBSVM and LIBLINEAR}
 
-LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008} are two high-performance libraries for SVM and Logistic Regression. Due to their low-level implementation in C, the functions are faster than equivalent models programmed in MATLAB. In order to use the libraries with MVPA-Light, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In MVPA-Light, the classifiers are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}. To use LIBSVM for Support Vector regression (SVR), set \ttt{model = 'svr'}.
+LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008} are two high-performance libraries for SVM and Logistic Regression. Due to their low-level implementation in C, the functions are faster than equivalent models programmed in MATLAB. In order to use the libraries with MVPA-Light, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In MVPA-Light, the models are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}.
 
 \subsection{FieldTrip integration}
 
@@ -550,7 +550,7 @@ To illustrate the application of MVPA-Light to fMRI data, another analysis was c
     \item Searchlight analysis: Which of the brain regions contain discriminative information that discriminates between faces vs houses?
 \end{enumerate}
 
- Leave-one-session-out cross-validation is used to calculate classification performance. Multi-class LDA with 8 classes with automatic shrinkage regularization serves as a classifier. For the searchlight analysis, binary LDA contrasting faces vs houses is used with AUC serving as metric. The searchlight consists of a 3x3x3 cube of voxels that is centered on each target voxel. A level 2 cluster permutation test is computed on the AUC values again a null hypothesis that AUC is equal to 0.5. Scripts used in the fMRI and MEEG analyses are available in the accompanying GitHub repository \footnote{https://github.com/treder/MVPA-Light-Paper}.
+ Leave-one-session-out cross-validation is used to calculate classification performance. Multi-class LDA with 8 classes with automatic shrinkage regularization serves as a classifier. For the searchlight analysis, binary LDA contrasting faces vs houses is used with AUC serving as metric. The searchlight consists of a 3x3x3 cube of voxels that is centered on each target voxel. A level 2 cluster permutation test is computed on the AUC values again a null hypothesis that AUC is equal to 0.5. 
 
 \red{\subsection{Benchmarking}}
 
@@ -565,16 +565,30 @@ To be as unbiased as possible, only ... without hyperparameter tuning ...
     \item Training speed: : Training time in milliseconds ... To avoid conflation between training time and nested hyperparameter tuning, all hyperparameters will be fixed a priori. ... 
 \end{enumerate}
 
+the following three datasets
 
 \begin{itemize}
-    \item MVPA-Light: lda, logreg, svm, libsvm, liblinear, naive\_bayes.
-    \item MATLAB: fitdiscm (LDA), lassglm (regularized Logistic Regression), 
+    \item MEG single-subjects. ... The \cite{Wakeman2015ADataset} ...  Since many tested  classifiers are binary, only the classes famous vs scrambled faces are considered. 
+    \item MEG super-subject. A single large dataset is obtained by concatenating all trials of all MEG subjects to a 'super-subject'.  
+    \item fMRI: ... 6 subjects ... Voxels with zero signal are removed, yielding a dataset of 216 samples and XXX voxels serving as feature vector. 
 \end{itemize}
 
+While the single-subject MEG data is a dataset that of typical size for MEEG analysis, the latter two ... map out extreme cases ... 
+The 
 
 Benchmarking is based on the MEEG dataset, performing classification for every time point. For vetting training time ... Two additional datasets are considered to also cover extreme cases. Firstly, MEEG trials of all subjects are combined to a single dataset. This yields a "$N\gg P$" dataset, that is, data where trials vastly outnumber features (16,000 trials, 366 features). Secondly, we use full-brain \cite{Haxby2001}  dataset. By involving all voxels as features a "$P\gg N$" dataset is created, that is, data where features vastly outnumber trials (XXX trials per subject, XXX features). These latter two cases test the efficiency of a classifier dealing with a large number of trials or a large number of features.
 
-Note that the results need to be taken with a pinch of salt. The implementations might implement different regularization strategies (e.g. MATLAB's logistic regression does not support logF or L2 regularization) 
+
+\begin{itemize}
+    \item MVPA-Light: lda, logreg, svm, libsvm, liblinear, naive bayes, ridge, kernel ridge.
+    \item MATLAB: fitdiscm, lassoglm, fitcnb, fitcsvm, ridge, fitcsvr.
+    \item Scikit-Learn (Python): ...
+    \item R: 
+\end{itemize}
+
+Note that the benchmarking results need to be taken with a pinch of salt. Implementations of the same model in different software packages can use different solvers, different regularization techniques, and have a different set of hyperparameters and capabilities that may cause additional overhead during optimization.
+
+Scripts used for benchmarking as well as the fMRI and MEEG analyses are available in the accompanying GitHub repository\footnote{https://github.com/treder/MVPA-Light-Paper}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -607,7 +621,7 @@ A high overall performance was obtained for LDA with 8 classes. Misclassificatio
 
 \textit{Time classification}. Multi-class classification accuracy was calculated for each time point following stimulus onset. Solid lines show the means across subjects and the shaded areas correspond to standard error. Masks  were used to select voxels in the ventral temporal area, voxels responsive to faces, or voxels responsive to houses. Although all ROIs and time points yield performances above the chance level of 12.5\%, the ventral temporal area (which comprises both face and house responsive voxels) yields the best performance. For the latter, classification performance peaks at about 5 s after stimulus onset.
 
-\textit{Searchlight analysis}. AUC values averaged across subjects are depicted. The AUCs are masked by the significant cluster ($p < .001$) and overlayed on an averaged anatomical MRI. High values $>0.8$ are found in dorsal and ventral visual areas including the paraphippocampal place area and the fusiform area, nicely dovetailing with the original findings of \cite{Haxby2001}.
+\textit{Searchlight analysis}. AUC values averaged across subjects are depicted. The AUCs are masked by the significant cluster ($p < .01$) and overlayed on an averaged anatomical MRI. Although the cluster is large, high values $>0.8$ are predominantly found in dorsal and ventral visual areas including the paraphippocampal place area and the fusiform area, nicely dovetailing with the original findings of \cite{Haxby2001}.
 
 \red{\subsubsection{Benchmarking}}
 
