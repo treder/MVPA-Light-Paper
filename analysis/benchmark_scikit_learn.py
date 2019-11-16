@@ -31,7 +31,6 @@ do_benchmark_haxby = 0
 # Define models
 lda             = LinearDiscriminantAnalysis()
 logreg          =  LogisticRegression()
-logreg_dual     =  LogisticRegression(dual=True) # use this on the fmri data
 nb              =  GaussianNB()
 svm_linear      = svm.SVC(kernel='linear')
 svm_rbf         = svm.SVC(kernel='rbf')
@@ -159,7 +158,7 @@ if do_benchmark_supersubject:
     # Read class labels and data X
     f = h5py.File(filepath, mode='r')
     clabel = np.array(f['clabel'], dtype='int')
-    X  = np.array(f['X'])
+    X  = np.array(f['M'])
     time  = np.array(f['time'])
     print(X.shape)
 
@@ -184,7 +183,7 @@ if do_benchmark_supersubject:
 
     for t in range(n_time):   # --- loop across subjects ---
 
-        if t % 1 == 0: print(t, '..', end='')
+        if t % 10 == 0: print(t, '..')
 
         X_t         = X[:,:,t]
 
@@ -226,12 +225,12 @@ if do_benchmark_haxby:
     print('Loading Haxby fMRI')
 
     nsubjects = 6
+    ntime = 216
     Z = np.zeros(nsubjects);
 
     # Time -- classifiers
     time_lda    = Z.copy()
     time_logreg = Z.copy()
-    time_logreg_dual = Z.copy()
     time_nb     = Z.copy()
     time_svm_linear = Z.copy()
     time_svm_rbf    = Z.copy()
@@ -249,39 +248,40 @@ if do_benchmark_haxby:
         filepath = haxby_resultsdir + f'benchmarking_data_haxby_subject{n+1}.mat'
 
         # Read class labels and data X
-        clabel = factor(h5read(filepath,'clabel'))
-        X = h5read(filepath,'X')
+        f = h5py.File(filepath, mode='r')
+        print(f.keys())
+        clabel = np.array(f['clabel'], dtype='int')[0,:]
+        X  = np.array(f['X']).transpose()
+        print(X.shape)
 
         # Create a dummy numerical regression target which roughly represents time-in-experiment
-        y = np.array(range(n_time), dtype='float')
+        y = np.array(range(ntime), dtype='float')
 
         ## --- TIMING of classification models ---
-        tic = process_time(); lda.fit(X_t, clabel)
-        time_lda[n,t] = process_time() - tic
-        tic = process_time(); logreg.fit(X_t, clabel)
-        time_logreg[n,t] = process_time() - tic
-        tic = process_time(); logreg_dual.fit(X_t, clabel)
-        time_logreg_dual[n,t] = process_time() - tic
-        tic = process_time(); nb.fit(X_t, clabel)
-        time_nb[n,t] = process_time() - tic
-        tic = process_time(); svm_linear.fit(X_t, clabel)
-        time_svm_linear[n,t] = process_time() - tic
-        tic = process_time(); svm_rbf.fit(X_t, clabel)
-        time_svm_rbf[n,t] = process_time() - tic
+        tic = process_time(); lda.fit(X, clabel)
+        time_lda[n] = process_time() - tic
+        tic = process_time(); logreg.fit(X, clabel)
+        time_logreg[n] = process_time() - tic
+        tic = process_time(); nb.fit(X, clabel)
+        time_nb[n] = process_time() - tic
+        tic = process_time(); svm_linear.fit(X, clabel)
+        time_svm_linear[n] = process_time() - tic
+        tic = process_time(); svm_rbf.fit(X, clabel)
+        time_svm_rbf[n] = process_time() - tic
 
         ## --- TIMING of regression models ---
-        tic = process_time(); ridge.fit(X_t, clabel)
-        time_ridge[n,t] = process_time() - tic
-        tic = process_time(); kernel_ridge.fit(X_t, clabel)
-        time_kernel_ridge[n,t] = process_time() - tic
-        tic = process_time(); svr_linear.fit(X_t, clabel)
-        time_svr_linear[n,t] = process_time() - tic
-        tic = process_time(); svr_rbf.fit(X_t, clabel)
-        time_svr_rbf[n,t] = process_time() - tic
+        tic = process_time(); ridge.fit(X, clabel)
+        time_ridge[n] = process_time() - tic
+        tic = process_time(); kernel_ridge.fit(X, clabel)
+        time_kernel_ridge[n] = process_time() - tic
+        tic = process_time(); svr_linear.fit(X, clabel)
+        time_svr_linear[n] = process_time() - tic
+        tic = process_time(); svr_rbf.fit(X, clabel)
+        time_svr_rbf[n] = process_time() - tic
 
     # Turn average into dataframe and save
     print('Saving data as CSV')
-    time = pd.DataFrame(data={'LDA' : time_lda, 'LogReg' : time_logreg, 'LogReg (Dual)' : time_logreg_dual, \
+    time = pd.DataFrame(data={'LDA' : time_lda, 'LogReg' : time_logreg, \
       'Naive Bayes':time_nb, 'SVM (linear)':time_svm_linear, 'SVM (RBF)':time_svm_rbf, \
       'Ridge':time_ridge, 'Kernel Ridge':time_kernel_ridge, 'SVR (linear)':time_svr_linear, 'SVR (RBF)':time_svr_rbf})
     time.to_csv(resultsdir + 'benchmarking_results_fmri_scikit_learn.csv')
