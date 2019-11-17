@@ -75,7 +75,7 @@ for n=1:nsubjects     % --- loop across subjects
     acc.mat_svm_rbf    = Z;
     
     time = struct();
-    % MVPA Light - time
+    % MVPA Light - classification (time)
     time.mv_lda        = Z;
     time.mv_logreg     = Z;
     time.mv_nb         = Z;
@@ -88,12 +88,24 @@ for n=1:nsubjects     % --- loop across subjects
     time.mv_liblinear_logreg_primal = Z;
     time.mv_liblinear_logreg_dual   = Z;
     
-    % MATLAB - time
+    % MATLAB - classification (time)
     time.mat_lda        = Z;
     time.mat_logreg     = Z;
     time.mat_nb         = Z;
     time.mat_svm_linear = Z;
     time.mat_svm_rbf    = Z;
+    
+    % MVPA Light - regression (time)
+    time.mv_ridge        = Z;
+    time.mv_kernel_ridge = Z;
+    time.mv_svr_linear   = Z;
+    time.mv_svr_rbf      = Z;
+    
+    % MATLAB - regression (time)
+    time.mat_ridge        = Z;
+    time.mat_svr_linear = Z;
+    time.mat_svr_rbf    = Z;
+
     
     
     %% Out of the box classification
@@ -234,17 +246,6 @@ for n=1:nsubjects     % --- loop across subjects
         % so use full data for training.
         y = (1:size(X_t,1))';
         
-        % MVPA Light
-        time.mv_ridge        = Z;
-        time.mv_kernel_ridge = Z;
-        time.mv_svr_linear   = Z;
-        time.mv_svr_rbf      = Z;
-        
-        % MATLAB
-        time.mat_ridge        = Z;
-        time.mat_svr_linear = Z;
-        time.mat_svr_rbf    = Z;
-        
         %% Time it - MVPA-Light -- regression
         param_mv_ridge = mv_get_hyperparameter('ridge');
         param_mv_ridge.lambda = 0.1;
@@ -304,7 +305,7 @@ n_time = length(time);
 Z = zeros(n_time, 1);
 
 time = struct();
-% MVPA Light
+% MVPA Light - classification
 time.mv_lda        = Z;
 time.mv_logreg     = Z;
 time.mv_nb         = Z;
@@ -317,12 +318,24 @@ time.mv_liblinear_svm_dual   = Z;
 time.mv_liblinear_logreg_primal = Z;
 time.mv_liblinear_logreg_dual   = Z;
 
-% MATLAB
+% MATLAB - classification
 time.mat_lda        = Z;
 time.mat_logreg     = Z;
 time.mat_nb         = Z;
 time.mat_svm_linear = Z;
 time.mat_svm_rbf    = Z;
+
+% MVPA Light - regression
+time.mv_ridge        = Z;
+time.mv_kernel_ridge = Z;
+time.mv_svr_linear   = Z;
+time.mv_svr_rbf      = Z;
+
+% MATLAB - regression
+time.mat_ridge        = Z;
+time.mat_svr_linear = Z;
+time.mat_svr_rbf    = Z;
+
 
 
 for t=1:n_time     % --- loop across time points
@@ -413,18 +426,7 @@ for t=1:n_time     % --- loop across time points
     % Furthermore, the test set is not needed here since we only train,
     % so use full data for training.
     y = (1:size(X_t,1))';
-    
-    % MVPA Light
-    time.mv_ridge        = Z;
-    time.mv_kernel_ridge = Z;
-    time.mv_svr_linear   = Z;
-    time.mv_svr_rbf      = Z;
-    
-    % MATLAB
-    time.mat_ridge        = Z;
-    time.mat_svr_linear = Z;
-    time.mat_svr_rbf    = Z;
-    
+        
     %% Time it - MVPA-Light -- regression
     
     param_mv_ridge = mv_get_hyperparameter('ridge');
