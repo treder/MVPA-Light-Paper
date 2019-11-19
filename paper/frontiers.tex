@@ -129,7 +129,7 @@ MVPA-Light is a MATLAB toolbox for multivariate pattern analysis (MVPA). It prov
 \section{Introduction}
 
 During the early 2010s, multivariate pattern analysis (MVPA) became a mainstream statistical tool in EEG/MEG research \citep{Blankertz2011,Lemm2011,Mur2009,Grootswagers2017DecodingData,Pereira2009,Varoquaux2017}. It can be considered as a complement to the set of traditional statistical tools available to researchers (e.g. t-test, ANOVA). MVPA is particularly suited to large, multivariate datasets. Furthermore, since many classifiers make few or no assumptions about the data distribution, and statistical significance is often established using permutation tests, MVPA can be considered as a set of non-parametric statistical tools.
-One of the primary applications of MVPA is \textit{classification}. In classification, an algorithm called \textit{classifier} takes a multivariate pattern of brain activity (referred to as \textit{features}) as input and maps it onto a categorical brain state or experimental condition (referred to as \textit{class label}). In other words, the task of a classifier is to predict class labels given features. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. It is worth noting that classification is often performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. \red{Another important application of MVPA is \textit{regression}. It shares many characteristics with classification, but it uses a \textit{regression model} to map features onto a continuous variable (e.g. reaction time) referred to a \textit{responses}. Consequently, predictions of the regression model are continuous  (e.g. predicted reaction time given a brain pattern).}
+One of the primary applications of MVPA is \textit{classification}. In classification, an algorithm called \textit{classifier} takes a multivariate pattern of brain activity (referred to as \textit{features}) as input and maps it onto a categorical brain state or experimental condition (referred to as \textit{class label}). In other words, the task of a classifier is to predict class labels given features. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. It is worth noting that classification is often performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. \red{Another important application of MVPA is \textit{regression}. It shares many characteristics with classification, but it maps features onto a continuous variable (e.g. reaction time) referred to a \textit{responses} rather than class labels. Consequently, predictions of the regression model are continuous  (e.g. predicted reaction time given a brain pattern).}
 
 A number of excellent MATLAB toolboxes for MVPA have been developed over the years, including the Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Berlin BCI toolbox \citep{Blankertz2016TheControl}, CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}, Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and The Decoding Toolbox (TDT) \citep{Hebart2015TheData}. Beyond MATLAB, the probably most popular computer languages for machine learning are Python and R, with outstanding toolboxes such as Scikit Learn \citep{Pedregosa2011Scikit-learn:Python} for Python and Caret \citep{Kuhn2008BuildingPackage} and MLR \citep{Bischl2000Mlr:R} for R. A comprehensive comparison of MVPA-Light with all of these toolboxes is beyond the scope of this paper, but we believe that what sets MVPA-Light apart is the adherence to all of the following design principles: 
 
@@ -138,7 +138,7 @@ A number of excellent MATLAB toolboxes for MVPA have been developed over the yea
 \item \textit{transparent}: the toolbox has a shallow code base with well-documented functions. In many cases, the function call stack has a depth of two within the toolbox. For instance, a call to \texttt{mv\_classify} using an LDA classifier triggers calls to functions such as  \texttt{mv\_check\_inputs}, \texttt{train\_lda} and \texttt{test\_lda}. Although the train/test functions might call additional optimization functions, most of the work is done at these two shallowest levels. To preserve the shallowness, high-level functions replicate some code that might be shared otherwise. Furthermore, object orientation and encapsulation is avoided in favour of the more transparent MATLAB structs.
 \item \textit{fast}: all models and high-level functions are written with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, Logistic Regression and SVM use iterative optimization algorithms written in MATLAB. However, these algorithms run faster using compiled code. To this end, an interface is provided for LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008}, two excellent C implementations of Logistic Regression and SVM for users who do not shy away from compiling the code on their platform.
 \item \textit{modular and pluggable}: it is possible, and intended, to harvest parts of the code such as the classifiers for other purposes. It is also easy to plug the toolbox into a larger EEG/MEG processing framework. An interface for FieldTrip \citep{Oostenveld2011} is described in the Methods section.
-\item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalization including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparamaters required by classifiers and regression models can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox.
+\item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalization including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparameters required by classifiers and regression models can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox.
 \end{itemize}
 
 It is worth noting that MVPA-Light is a purely statistical toolbox. That is, it assumes that data has been preprocessed with a neuroimaging toolbox and comes in the shape of MATLAB arrays. Many neuroimaging toolboxes (e.g. FieldTrip, SPM, EEGLAB) store the imaging  data in such arrays, so that MVPA-Light can easily be used as a plugin tool. This comes with the perk that adaptation to different imaging modalities is straightforward.
@@ -164,7 +164,7 @@ perf = mv_classify(cfg, X, clabel);
 
 The output value \ttt{perf} contains the classifier performance measure, in this case a single AUC value averaged across test folds and repetitions. \ttt{mv\_classify} is part of the high-level interface that will be discussed next.
 
-In the next section, the toolbox is described in more detail and classification analysis based on publicly available MEEG \citep{Wakeman2014OpenfMRI,Wakeman2015ADataset} and fMRI \citep{Haxby2001} datasets is reported upon.
+In the next section, the toolbox is described in more detail and example classification analyses are performed using the publicly available \cite{Wakeman2014OpenfMRI,Wakeman2015ADataset} MEEG dataset and the \cite{Haxby2001} dataset.
 
 %%% ------------------------
 %%% ------------------------
@@ -175,22 +175,22 @@ In the next section, the toolbox is described in more detail and classification 
 
 \red{\subsection{Requirements}}
 
-A standard Desktop or Laptop is sufficient to run MVPA-Light. The memory requirement is dictated by the memory footprint  of the dataset. Since some functions operate on a copy of the data, it is recommended that the available RAM exceeds the size of the dataset by at least a factor of two (e.g. 4+ GB RAM for a 2 GB dataset). MVPA-Light is supported by MATLAB 2012a and more recent versions. The Statistics toolbox is required at some points in the toolbox (e.g. for calculating t-values). The cluster permutation test in \ttt{mv\_statistics} uses the Image Processing toolbox to extract the clusters.
+A standard desktop computer is sufficient to run MVPA-Light. The RAM requirement is dictated by the memory footprint of the dataset. Since some functions operate on a copy of the data, it is recommended that the available RAM exceeds the size of the dataset by at least a factor of two (e.g. 4+ GB RAM for a 2 GB dataset). MVPA-Light is supported by MATLAB 2012a and more recent versions. The Statistics toolbox is required at some points in the toolbox (e.g. for calculating t-values). The cluster permutation test in \ttt{mv\_statistics} uses the Image Processing toolbox to extract the clusters.
 
 %%% -----------------------------
 %%% --- HIGH-LEVEL FUNCTIONS ----
 %%% -----------------------------
 \subsection{High-level interface}
 
-The structure of the toolbox is depicted in \prettyref{fig:structure}. \red{The toolbox can be interacted with through high-level functions that cover common classification tasks. \ttt{mv\_classify} is a  general-purpose function that works on data of arbitrary dimension (e.g. time-frequency data). It performs any combination of cross-validation, searchlight analysis, generalization, and other tasks. Two more specialized functions are provided for convenience: \ttt{mv\_classify\_across\_time}  and \ttt{mv\_classify\_timextime}, assume that the data has a time dimension, i.e. it is a 3-D [samples $\times$ features $\times$ time points] array. \ttt{mv\_classify\_across\_time} performs classification for every time point, resulting in a vector of cross-validated metrics, the length of the vector being the number of time points. \ttt{mv\_classify\_timextime} implements time generalization \citep{King2014}, that is, classification for every combination of training and test time points, resulting in a 2-D matrix of cross-validated metrics. For regression tasks, the equivalent to \ttt{mv\_classify} is the function \ttt{mv\_regress}. It also works with data of arbitrary dimension and supports both searchlight and generalization.}
+The structure of MVPA-Light is depicted in \prettyref{fig:structure}. \red{The toolbox can be interacted with through high-level functions that cover common classification tasks. \ttt{mv\_classify} is a  general-purpose function that works on data of arbitrary dimension (e.g. time-frequency data). It performs any combination of cross-validation, searchlight analysis, generalization, and other tasks. Two more specialized functions are provided for convenience: \ttt{mv\_classify\_across\_time}  and \ttt{mv\_classify\_timextime}, assume that the data has a time dimension, i.e. it is a 3-D [samples $\times$ features $\times$ time points] array. \ttt{mv\_classify\_across\_time} performs classification for every time point, resulting in a vector of cross-validated metrics, the length of the vector being the number of time points. \ttt{mv\_classify\_timextime} implements time generalization \citep{King2014}, that is, classification for every combination of training and test time points, resulting in a 2-D matrix of cross-validated metrics. For regression tasks, the equivalent to \ttt{mv\_classify} is the function \ttt{mv\_regress}. It also works with data of arbitrary dimension and supports both searchlight and generalization.}
 
 All high-level functions take three input arguments. First, \ttt{cfg}, a configuration structure wherein parameters for the analysis can be set. Second, \ttt{X}, the data acting as input to the model. Third, \ttt{clabel} or \ttt{y}, a vector of class labels or responses. Some of the parameters in the \ttt{cfg} struct are common  to all high-level functions:
 
 \begin{itemize}
     \item \ttt{cfg.model}: name of the classifier or regression model, e.g. \ttt{'lda'}.
-    \item \ttt{cfg.hyperparameter}: a substruct that specifies the hyperparameters for the model. For instance, \ttt{cfg.hyperparameter.lambda = 0.1} sets the magnitude of shrinkage regularization in LDA.
+    \item \ttt{cfg.hyperparameter}: a struct that specifies the hyperparameters for the model. For instance, \ttt{cfg.hyperparameter.lambda = 0.1} sets the magnitude of shrinkage regularization in LDA.
     \item \ttt{cfg.metric}: specifies the metric to be calculated from the model predictions. e.g. classification accuracy or mean-squared error for regression. Metrics are introduced in \prettyref{sec:metrics}.
-    \item \ttt{cfg.preprocess}: a substruct that specifies a nested preprocessing pipeline. The pipeline consists of preprocessing operations that are applied on train and test data separately. Preprocessing is discussed in \prettyref{sec:preprocessing}.
+    \item \ttt{cfg.preprocess}: a struct that specifies a nested preprocessing pipeline. The pipeline consists of preprocessing operations that are applied on train and test data separately. Preprocessing is discussed in \prettyref{sec:preprocessing}.
 \end{itemize}
 
 Additionally, the \ttt{cfg} struct includes the cross-validation settings explained in the next section.
@@ -210,9 +210,9 @@ To obtain a realistic estimate of classification or regression performance and c
 
 \subsubsection{Hyperparameter tuning}
 
-Hyperparameters are parameters describing a classifier or regression model that need to be specified by the user, such as the type and amount of regularization applied, the type of kernel, and the kernel width $\gamma$ for Gaussian kernels. From the user's perspective, hyperparameters can be nuisance parameters: it is sometimes not clear a priori how to set them, but their exact value can have a substantial effect on the result.
+Hyperparameters are parameters of a classifier or regression model that need to be specified by the user, such as the type and amount of regularization applied, the type of kernel, and the kernel width $\gamma$ for Gaussian kernels. From the user's perspective, hyperparameters can be nuisance parameters: it is sometimes not clear a priori how to set them, but their exact value can have a substantial effect on the result.
 
-MVPA-Light tries to automate hyperparameter selection as much as possible. This is done using either reasonable default values, hyperparameter estimators (e.g., \cite{Ledoit2003HoneyMatrix} for LDA) or the use of  hyperparameter-free regularizers (log-F(1,1) for Logistic Regression). If this is not possible, automated grid search using nested cross-validation can be used for testing out different hyperparameter combinations essentially by brute force. \red{For better performance, bespoke hyperparameter tuning functions are implemented for some classifiers. Otherwise, the generic tuning function \ttt{mv\_tune\_hyperparameters} is used.}
+MVPA-Light tries to automate hyperparameter selection as much as possible. This is done using either reasonable default values, hyperparameter estimators (e.g., \cite{Ledoit2003HoneyMatrix} for LDA) or  hyperparameter-free regularizers (log-F(1,1) for Logistic Regression). If this is not possible, automated grid search using nested cross-validation can be used for testing out different hyperparameter combinations essentially by brute force. \red{For better performance, bespoke hyperparameter tuning functions are implemented for some classifiers. Otherwise, the generic tuning function \ttt{mv\_tune\_hyperparameters} is used.}
 
 %%% ------- PREPROCESSING -------
 \subsubsection{Preprocessing}\label{sec:preprocessing}
@@ -269,14 +269,14 @@ where $\S_b$ and $\S_w$ are defined as
 \end{alignedat}
 \end{equation*}
 
-Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class mean, $\mbar$ is the sample mean, and $\mathcal{C}_j$ is the set of indices of instances in class $j$. Applied to event-related potential data, LDA is  formally equivalent to LCMV beamforming \citep{Treder2016}. It has a simple analytical solution given by
+Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class mean, $\mbar$ is the sample mean, and $\mathcal{C}_j$ is the set of indices of instances in class $j$. For two classes, LDA is formally equivalent to LCMV beamforming \citep{Treder2016} when applied to ERP data, and it has the simple analytical solution 
 
 \begin{equation}
 \label{eq:lda_solution}
 \w_{\text{lda}} = \S_w^{-1}\ (\m_1 - \m_2)
 \end{equation}
 
-For multiple classes, there is multiple vectors $\w_{\text{lda}}$. They are collected in a matrix $\W\in\R^{p\times(c-1)}$ and scaled such that $\W^\top\S_w\W = \I$ \citep{Bishop2007}. $\W$ can be obtained via the generalized eigenvalue problem
+For more than two classes, there is multiple vectors $\w_{\text{lda}}$. They are collected in a matrix $\W\in\R^{p\times(c-1)}$ and scaled such that $\W^\top\S_w\W = \I$ \citep{Bishop2007}. $\W$ can be obtained via the generalized eigenvalue problem
 
 \begin{align}
 \label{eq:LDA-eigenvalue-multiclass}
@@ -284,9 +284,7 @@ For multiple classes, there is multiple vectors $\w_{\text{lda}}$. They are coll
 \end{align}
 
 where $\mathbf{\Lambda}$ is a diagonal matrix of eigenvalues. 
-\red{The threshold is calculated under the assumption of equal probabilities for the classes. Using the same assumption, posterior class probabilities can be calculated by evaluating Gaussian densities parameterized by the class centroids and their common covariance matrix}.
-
-In EEG/MEG data, $\S_w$ is often ill-conditioned or singular and hence the inverse in \prettyref{eq:lda_solution} cannot be calculated reliably. Therefore, shrinkage regularization is applied by default and $\S_w$ is replaced by $\widetilde{\S}_w$:
+\red{The threshold is calculated under the assumption of equal probabilities for the classes. Posterior class probabilities can be calculated by evaluating Gaussian densities parameterized by the class centroids and their common covariance matrix}. In EEG/MEG data, $\S_w$ is often ill-conditioned or singular and hence the inverse in \prettyref{eq:lda_solution} cannot be calculated reliably. Therefore, shrinkage regularization is applied by default and $\S_w$ is replaced by $\widetilde{\S}_w$:
 
 \begin{align}
 \label{eq:shrinkage}
@@ -298,24 +296,24 @@ where $\I$ is the identity matrix and $\nu = \text{trace}(\S_w)/p$ \citep{Blanke
 In the literature, LDA has also been used with ridge-regression type regularization, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularization by setting \ttt{reg = 'ridge'}. However, both regularization approaches are equivalent up to scaling. For a given shrinkage value $\lambda<1$, the corresponding ridge regularization value is $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$
 \citep{Treder2018Cross-validationLDA}.
 
-\red{If $p \gg n$, that is, the number of features is much larger than the number of samples, calculation and inversion of the features $\times$ features covariance matrix can be computationally expensive. In these cases, the samples $\times$ samples Gram matrix can be used instead. The hyperparameter \ttt{form} decides on whether the 'primal' form based on covariance or 'dual' form based on the Gram matrix is used. By default (\ttt{form = 'auto'}), this is decided automatically by comparing $n$ and  $p$. The resultant formula is equivalent to kernel FDA with a linear kernel, as explicated in the next section. However, the regularization of $\mathbf{N}$ in  kernel FDA is \textit{not} equivalent to the regularization of $\S_w$. Furthermore, to the best of our knowledge, the Ledoit-Wolf estimate has not been reported in the literature using dual notation. Therefore, a dual regularization approach for LDA is developed in \prettyref{app:dualLDA}.}
+\red{If $p \gg n$, that is, the number of features is much larger than the number of samples, calculation and inversion of the [features $\times$ features] covariance matrix can be computationally expensive. In these cases, the [samples $\times$ samples] Gram matrix can be used instead. The hyperparameter \ttt{form} decides on whether the 'primal' form based on covariance or 'dual' form based on the Gram matrix is used. By default (\ttt{form = 'auto'}), this is decided automatically by comparing $n$ and  $p$. The resultant formula is equivalent to kernel FDA with a linear kernel, as explicated in the next section. However, the regularization of $\mathbf{N}$ in  kernel FDA is \textit{not} equivalent to the regularization of $\S_w$. Furthermore, to the best of our knowledge, the Ledoit-Wolf estimate has not been reported in the literature using dual notation. Therefore, a dual regularization approach for LDA is developed in \prettyref{app:dualLDA}.}
 
 
 %%% -------- KERNEL FDA --------
 \subsubsection{Kernel Fisher Discriminant Analysis}
 
-Kernel Fisher Discriminant Analysis (KFDA) is the kernelized version of LDA. Roughly speaking, kernels allow for the data to be mapped into a Reproducing Kernel Hilbert Space (RKHS) wherein ordinary LDA is performed. Since the map is non-linear, the resultant hyperplane in high-dimensional space corresponds to a non-linear decision boundary in the original feature space \citep{Mika1999FisherKernels}. This allows for the solution of non-linear classification problems. Let $\K\in\R^{n\times n}$ be the kernel matrix representing the inner products of the samples in the RKHS and $\K_j\in\R^{n \times n_j}$ be the submatrix of $\K$ with rows corresponding to samples in class $j$. The kernelized versions of between-classes and within-class scatter are given by the matrices $\M$ and $\mathbf{N}$ as
+Kernel Fisher Discriminant Analysis (KFDA) is the kernelized version of LDA. Roughly speaking, kernels allow for the data to be mapped into a Reproducing Kernel Hilbert Space (RKHS) wherein ordinary LDA is performed. Since the map is non-linear, the resultant hyperplane in high-dimensional space corresponds to a non-linear decision boundary in the original feature space \citep{Mika1999FisherKernels}. This allows for the solution of non-linear classification problems. Let $\K\in\R^{n\times n}$ be the kernel matrix representing the inner products of the samples in the RKHS and $\K_j\in\R^{n \times n_j}$ be the submatrix of $\K$ with columns corresponding to samples in class $j$. The kernelized versions of between-classes and within-class scatter are given by the matrices $\M$ and $\mathbf{N}$ as
 
 
 \begin{equation}
 \label{eq:kernelFDA}
 \begin{alignedat}{2}
-\M =\ &  \sum_{j=1}^C n_j\ (\M_j - \M_*)\,(\M_j-\M_*)^\top\\
-\mathbf{N} =\ & \sum_{j=1}^C \K_j\ (\mathbf{I} - \mathbf{1})\  \K_j^\top
+\M =\ &  \sum_{j=1}^c n_j\ (\M_j - \M_*)\,(\M_j-\M_*)^\top\\
+\mathbf{N} =\ & \sum_{j=1}^c \K_j\ (\mathbf{I} - \mathbf{1})\  \K_j^\top
 \end{alignedat}
 \end{equation}
 
-where $\M_j\in\R^n$ is the average of the columns of $\K_j$ and $\M_*$ is the average of the columns of $\K$. Then the solution is given by the $(C-1)$ leading eigenvectors of $\mathbf{N}^{-1} \mathbf{M}$. 
+where $\M_j\in\R^n$ is the mean of the columns of $\K_j$ and $\M_*$ is the mean of the columns of $\K$. Then the solution is given by the $(c-1)$ leading eigenvectors of $\mathbf{N}^{-1} \mathbf{M}$. 
 Like in LDA, the model can be regularized using ridge regularization (\ttt{reg = 'ridge'}) or shrinkage regularization (\ttt{reg = 'shrink'}). Using shrinkage, $\mathbf{N}$ is replaced by $\widetilde{\mathbf{N}} = (1-\lambda)\ \mathbf{N} + \lambda\,\nu\,\I$. Unlike LDA, there is currently no approach for automatically choosing the hyperparameter $\lambda$, so it needs to be set by the user. However, in many cases a small shrinkage value (\ttt{lambda = 0.01}) is adequate.
 
 %%% -------- LOGISTIC REGRESSION --------
@@ -364,8 +362,7 @@ The optimal weights are found by minimising the constrained dual loss objective
 \end{split}
 \end{align}
 
-where $\al\in\R^n$ is the dual weight vector and  $\mathbbm{1}$ is a vector of 1's. $\Q$ is the kernel matrix with the class labels absorbed, i.e. $\Q_{ij} = y_i y_j\, k(\x_i,\x_j)$, where $k$ is the kernel function, $y_i, y_j \in\{+1, -1\}$ are the class labels for the $i$-th and $j$-th sample, and the two classes are coded as +1 and -1. The optimization of the weights is performed using a Dual Coordinate Descent
-approach  \citep{Hsieh2008ASVM} implemented in the function \ttt{DualCoordinateDescent}. The hyperparameter  \ttt{c} controls the amount of regularization.
+where $\al\in\R^n$ is the dual weight vector and  $\mathbbm{1}$ is a vector of 1's. $\Q$ is the kernel matrix with the class labels absorbed, i.e. $\Q_{ij} = y_i y_j\, k(\x_i,\x_j)$, where $k$ is the kernel function, $y_i, y_j \in\{+1, -1\}$ are the class labels for the $i$-th and $j$-th sample, and the two classes are coded as +1 and -1. The hyperparameter  \ttt{c} controls the amount of regularization. The optimization of the weights is performed using a Dual Coordinate Descent approach  \citep{Hsieh2008ASVM} implemented in the function \ttt{DualCoordinateDescent}. 
 
 
 Unlike LDA and Logistic Regression, a SVM has no underlying probabilistic model that yields class probabilities. However, a Platt approximation using an external function (\ttt{http://www.work.caltech.edu/~htlin/program/libsvm/}) is used to estimate class probabilities if required.
@@ -389,7 +386,7 @@ In Naive Bayes classification, the features are assumed to be conditionally inde
 P(y = k\,|\,\x) = \frac{P(y = k)\,\prod_{j=1}^p P(\xf{j}\,|\,k)}{P(\x)}
 \end{equation}
 
-MVPA-Light uses Gaussians to model the univariate densities, that is $P(\xf{j}\,|\,k) = \frac{1}{\sqrt{2\pi\sig{k}{j}}} \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})$. The parameters of the model are thus the $\mf{k}{j}$'s (mean of the $j$-the feature in class $k$) and $\sig{k}{j}$'s (variance of the $j$-the feature in class $k$) estimated on the training data. Inserting the Gaussian densities into \prettyref{eq:naive_bayes} yields
+MVPA-Light uses Gaussians to model the univariate densities, that is $P(\xf{j}\,|\,k) = \frac{1}{\sqrt{2\pi\sig{k}{j}}} \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})$. The parameters of the model are thus the $\mf{k}{j}$'s (mean of the $j$-th feature in class $k$) and $\sig{k}{j}$'s (variance of the $j$-the feature in class $k$) estimated on the training data. Inserting the Gaussian densities into \prettyref{eq:naive_bayes} yields
 
 \begin{equation}
 \label{eq:naive_bayes_gaussian}
@@ -408,7 +405,7 @@ which can be transformed into posterior probabilities using the softmax function
 
 \begin{equation}
 \label{eq:naive_bayes_softmax}
-P(y = k\,|\,\x) = \frac{e^{d_k}}{\sum_{j=1}^C e^{d_j}}.
+P(y = k\,|\,\x) = \frac{e^{d_k}}{\sum_{j=1}^c e^{d_j}}.
 \end{equation}
 
 %%% ---------------------------------
@@ -417,7 +414,7 @@ P(y = k\,|\,\x) = \frac{e^{d_k}}{\sum_{j=1}^C e^{d_j}}.
 \subsection{Classifier output type}\label{sec:output}
 
 For every test sample, a classifier produces raw output. This output takes either a discrete form, as a class label (e.g. the integer 1 for class 1), or a continuous one. If it is continuous, it comes either as a \textit{decision value} or as a \textit{probability}. A decision value is an unbounded number that can be positive or negative. Its absolute value corresponds to the distance to the hyperplane. For two classes, the probability is a number between 0 and 1 representing the probability that a sample belongs to class 1. 
-In the high-level interface, the classifier output can be specified explicitly by setting \ttt{cfg.output\_type} to \ttt{'clabel'}, \ttt{'dval'}, or \ttt{'prob'}. For most cases, however, it suffices to let MVPA-Light infer the output type. Note that decision values or probabilities are not supported for multi-class problems. This is because in multi-class the classifier output can be multi-dimensional. 
+In the high-level interface, the classifier output can be specified explicitly by setting \ttt{cfg.output\_type} to \ttt{'clabel'}, \ttt{'dval'}, or \ttt{'prob'}. In most cases, however, it suffices to let MVPA-Light infer the output type.
 
 %%% -----------------------------
 %%% -------- REGRESSION  --------
@@ -429,7 +426,7 @@ Like classifiers, regression models are implemented using pairs of train/test fu
 %%% -------- RIDGE --------
 \red{\subsubsection{Ridge regression}}
 
-Ridge regression is used to analyze data that suffers from multicollinearity. Like in LDA, the model is regularized using a penalty that shrinks the weights towards zero. The ordinary least-squares relates $\X$ and $\y$ as $\y = \X\w + \epsilon$ where $\epsilon$ is normally distributed noise. For a given regularization parameter $\lambda\in[0,\infty)$, the primal and dual ridge solutions are given by
+Ridge regression is a regularized version of ordinary least-squares (OLS) regression that is useful for analyzing data that suffers from multicollinearity. The model is regularized using a penalty that shrinks the weights towards zero. For a given regularization parameter $\lambda\in[0,\infty)$, the primal and dual ridge solutions are given by
 
 
 \begin{align}
@@ -473,7 +470,7 @@ Classification & accuracy  &  [0,1] &  Fraction correctly predicted class labels
  &dval & ($-\infty,+\infty$) & For two classes only. Average decision value, for each class separately.\\
  &F1 & [0,1] & Combines precision and recall into a single score using the harmonic average 2*PR*R / (PR+R).\\
 &kappa & [-1, 1] & Cohen's kappa, a measure of inter-rater reliability.\\
-&precision (PR) & [0,1] & TP / (TP + FP). Fraction of samples labelled as positive that actually belong to the positive class. For multi-class, it is calculated per class from the unnormalized confusion matrix.\\
+&precision (PR) & [0,1] & TP / (TP + FP). Fraction of samples labeled as positive that actually belong to the positive class. For multi-class, it is calculated per class from the confusion matrix.\\
 &recall (R) & [0,1] & TP / (TP + FN). Fraction of positive samples that have been detected. For multi-class, it is calculated per class from the confusion matrix.\\
 &tval & ($-\infty,+\infty$) & For two classes only. T-test statistic for the unequal sample size, equal variance case, based on decision values.\\
 &none & ($-\infty,+\infty$) & Returns a cell array with the raw classifier outputs for all test sets.\\\hline
@@ -493,16 +490,16 @@ If cross-validation is used then the metric is initially calculated for each tes
 %%% ---------------------------------
 \red{\subsection{Statistical analysis}\label{sec:statistics}}
 
-In many neuroimaging experiments, establishing the statistical significance of a classification or regression metric is more important than maximizing the metric per se. The function \ttt{mv\_statistics} implements both Level 1 (single-subject) and Level 2 (group leve) statistical analyses of MVPA data. For Level 1 analysis, the following tests are available:
+In many neuroimaging experiments, establishing the statistical significance of a classification or regression metric is more important than maximizing the metric per se. The function \ttt{mv\_statistics} implements both Level 1 (single-subject) and Level 2 (group level) statistical analysis. For Level 1 analysis, the following tests are available:
 
 \begin{itemize}
-    \item Binomial test: uses a binomial distribution to calculate the p-value under the null hypothesis that classification accuracy is at chance level. Requires classification accuracy as metric.
-    \item Permutation test: non-parametric significance test. Creates a null distribution by shuffling the class labels of response vector and repeating the classification analysis e.g. 1000 times. 
-    \item Cluster permutation test: an elegant solution to the multiple comparisons problems arising when MVPA has been performed along multiple dimensions (e.g. for each time-frequency point). Uses the cluster statistic introduced in 
+    \item Binomial test: uses a binomial distribution to calculate the p-value under the null hypothesis that classification accuracy is at chance. Requires classification accuracy as metric.
+    \item Permutation test: non-parametric significance test. Creates a null distribution by shuffling the class labels or responses and repeating the multivariate analysis e.g. 1000 times. 
+    \item Cluster permutation test: an elegant solution to the multiple comparisons problems arising when MVPA is performed along multiple dimensions (e.g. for each time-frequency point). Uses the cluster statistic introduced in 
     \cite{Maris2007}.
 \end{itemize}
 
-For Level 2 analysis, a permutation test (with and without cluster correction) is available for within-subject and between-subject design.
+For Level 2 analysis, a permutation test (with and without cluster correction) is available for within-subject and between-subjects designs.
 
 \subsection{Custom classifiers and regression models}
 
@@ -510,68 +507,68 @@ MVPA-Light can easily be extended with custom models. To this end, the appropria
 
 \subsection{LIBSVM and LIBLINEAR}
 
-LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008} are two high-performance libraries for SVM and Logistic Regression. Due to their low-level implementation in C, the functions are faster than equivalent models programmed in MATLAB. In order to use the libraries with MVPA-Light, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In MVPA-Light, the models are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}.
+LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008} are two high-performance libraries for SVM and Logistic Regression. In order to use the libraries with MVPA-Light, the user needs to follow the installation instructions on the respective websites. In particular, the C-code needs to be compiled and added to the MATLAB path. In MVPA-Light, the models are denoted as \ttt{'libsvm'} and \ttt{'liblinear'}.
 
 \subsection{FieldTrip integration}
 
-The FieldTrip \citep{Oostenveld2011} function \ttt{ft\_statistics\_mvpa} provides a direct interface between FieldTrip and MVPA-Light. In brief, the function calls MVPA-Light functions to carry out classification analysis, and then stores the results back into FieldTrip structs. To use MVPA-Light from high-level FieldTrip functions such as \ttt{ft\_timelockstatistics}, one has to set the parameter \ttt{cfg.method = 'mvpa'}. The interface is introduced in detail in a tutorial on the FieldTrip website \footnote{\ttt{http://www.fieldtriptoolbox.org/tutorial/mvpa\_light/}}.
+The FieldTrip \citep{Oostenveld2011} function \ttt{ft\_statistics\_mvpa} provides a direct interface between FieldTrip and MVPA-Light. In brief, the function calls MVPA-Light functions to carry out multivariate analysis, and then stores the results back into FieldTrip structs. To use MVPA-Light from high-level FieldTrip functions such as \ttt{ft\_timelockstatistics}, one has to set the parameter \ttt{cfg.method = 'mvpa'}. The interface is introduced in detail in a tutorial on the FieldTrip website \footnote{\ttt{http://www.fieldtriptoolbox.org/tutorial/mvpa\_light/}}.
 
 %%% -------------------------
 %%% ----  DEVELOPMENT    ----
 %%% -------------------------
 \subsection{Development}\label{sec:development}
 
-Apart from the \ttt{main} branch intended for general use, the GitHub repository features a \ttt{devel} branch wherein new code is developed before merging into the main branch. Additionally, the branch features code that helps in maintaining the integrity of the toolbox. The \ttt{unittests/} subfolder features a unit testing framework with specific unit tests for all classifiers, optimization algorithms, high-level functions and some of the important utility functions. The unit tests make use of both the example EEG data, random noise, and simulated data generated from functions contained in the \ttt{simulation/} subfolder. Unit testing can be triggered by executing the \ttt{run\_all\_unittests} function.
+Apart from the \ttt{main} branch intended for general use, the GitHub repository features a \ttt{devel} branch wherein new code is developed before committing into the main branch. Additionally, the branch features code that helps in maintaining the integrity of the toolbox. The \ttt{unittests/} subfolder features a unit testing framework with specific unit tests for all models, optimization algorithms, high-level functions and some of the important utility functions. The unit tests make use of both the example EEG data, random noise, and simulated data generated from functions contained in the \ttt{simulation/} subfolder. Unit testing can be triggered by executing the \ttt{run\_all\_unittests} function.
 
 \subsection{Analysis of a MEEG dataset}
 
-To illustrate MVPA-Light on a real dataset, a multivariate analysis is conducted on a multi-subject, multi-modal face processing dataset \citep{Wakeman2015ADataset,Wakeman2014OpenfMRI}. The dataset contains 16 participants with EEG and MEG simultaneously recorded. The MEEG data was preprocessed using FieldTrip. It was low-pass filtered with a cut-off of 100 Hz and high-pass filtered using a FIR one-pass zero-phase filter with a cut-off of 0.1 Hz. A bandstop filter was applied at 50 Hz to suppress line noise. Subsequently, data was downsampled to 220 Hz and for each subject, the 6 separate runs were combined into a single dataset, yielding 880--889 trials per subject with roughly equal proportions for the three classes. All trials displaying famous faces were coded as class 1, familiar faces as class 2, and scrambled faces as class 3. MVPA was performed to investigate the following questions:
+To illustrate MVPA-Light on a real dataset, a multivariate analysis was conducted on a multi-subject, multi-modal face processing dataset \citep{Wakeman2015ADataset,Wakeman2014OpenfMRI}. The dataset contains 16 participants with EEG and MEG simultaneously recorded. The MEEG data was preprocessed using FieldTrip. It was low-pass filtered with a cut-off of 100 Hz and high-pass filtered using a FIR one-pass zero-phase filter with a cut-off of 0.1 Hz. A bandstop filter was applied at 50 Hz to suppress line noise. Subsequently, data was downsampled to 220 Hz and for each subject, the 6 separate runs were combined into a single dataset, yielding 880--889 trials per subject with roughly equal proportions for the three classes. All trials displaying famous faces were coded as class 1, familiar faces as class 2, and scrambled faces as class 3. MVPA was performed to investigate the following questions:
 
 \begin{enumerate}
-    \item ERP classification: \cite{Wakeman2015ADataset} found two prominent event-related components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier is used to investigate whether these components discriminate between the three classes and, if so, between which of them.
-    \item Time classification: Is there more discriminative information in MEG than in EEG? To answer this, classification across time is performed for three different channel sets, namely EEG only, MEG only, and EEG+MEG combined. 
-    \item Time-frequency classification: Is the discriminative information for famous vs scrambled faces confined to specific oscillatory frequencies and times? To answer this, time-frequency spectra are calculated for single trials and classification is performed at each time-frequency bin separately. 
-    \item Generalization: Are representations shared across time \citep{King2014} or frequency? To answer this, time generalization (time x time classification) is applied to the ERF data, and frequency generalization (frequency x frequency classification) is applied to the time-frequency data.
+    \item ERP classification: \cite{Wakeman2015ADataset} found two prominent event-related components, a N170 and a sustained component roughly starting at 400 ms post-stimulus. Cross-validation with a multi-class classifier was used to investigate whether these components discriminate between the three classes and, if so, between which of them.
+    \item Time classification: Is there more discriminative information in MEG than in EEG? To answer this, classification across time was performed for three different channel sets, namely EEG only, MEG only, and EEG+MEG combined. 
+    \item Time-frequency classification: Is the discriminative information for famous vs scrambled faces confined to specific oscillatory frequencies and times? To answer this, time-frequency spectra were calculated for single trials and classification was performed at each time-frequency bin separately. 
+    \item Generalization: Are representations shared across time \citep{King2014} or frequency? To answer this, time generalization (time x time classification) was applied to the ERF data, and frequency generalization (frequency x frequency classification) was applied to the time-frequency data.
 \end{enumerate}
 
-MVPA is performed at the sensor level using a LDA classifier. All analyses are cross-validated using 5-fold or 10-fold cross-validation. Only the MEG channels are used as features except for analysis 2, where different sets of channels are compared. To assess statistical significance, the following analyses are carried out:
+MVPA was performed at the sensor level using a LDA classifier. All analyses were cross-validated using 5-fold or 10-fold cross-validation. Only the MEG channels were used as features except for analysis 2, where different sets of channels were compared. To assess statistical significance, the following analyses were carried out:
 
 \begin{itemize}
-    \item Level 1 statistics. The goal is to establish the statistical significance for the time generalization contrasting famous vs scrambled faces using the EEG channels only (first subject only). Three statistical tests are compared: binomial, permutation, and cluster permutation tests. Permutation tests are based on 500 random permutations of the class labels. The cluster permutation test is corrected for multiple comparisons by using a cluster statistic, the other tests are uncorrected. For the cluster statistic, a critical value of 0.6 is chosen for  classification accuracy.
-    \item Level 2 statistics (across subjects). The AUC values obtained in the time-frequency classification analyses are statistically compared to a null value of 0.5 using cluster permutation tests based on a within-subject design.
+    \item Level 1 statistics. The goal was to establish the statistical significance for the time generalization contrasting famous vs scrambled faces using the EEG channels only (first subject only). For illustrative purposes, the three statistical tests contained in MVPA-Light were compared: binomial, permutation, and cluster permutation tests. Permutation tests were based on 500 random permutations of the class labels. The cluster permutation test was corrected for multiple comparisons by using a cluster statistic, the other tests were uncorrected. For the cluster statistic, a critical value of 0.6 was chosen for  classification accuracy.
+    \item Level 2 statistics (across subjects). The AUC values obtained in the time-frequency classification analyses were statistically compared to a null value of 0.5 using cluster permutation tests based on a within-subject design.
     
 \end{itemize}
 
 \red{\subsection{Analysis of a fMRI dataset}}
-To illustrate the application of MVPA-Light to fMRI data, another analysis was conducted using the dataset by \cite{Haxby2001}. It comprises the BOLD responses of 6 participants viewing images in 8 different sessions. Images were taken from 8 different living and non-living categories. The dataset was downloaded from \ttt{http://www.pymvpa.org/datadb/haxby2001.html}. The only preprocessing step applied was the application of a zero-phase Butterworth high-pass filter with a cut-off frequency of 0.01 Hz in order to remove slow drifts in the BOLD signal. The following questions were addressed:
+To illustrate the application of MVPA-Light to fMRI data, another analysis was conducted using the \cite{Haxby2001} dataset. It comprises the BOLD responses of 6 participants viewing images in eight different sessions. Images were taken from 8 different living and non-living categories. The dataset was downloaded from \ttt{http://www.pymvpa.org/datadb/haxby2001.html}. A zero-phase Butterworth high-pass filter with a cut-off frequency of 0.01 Hz was applied in order to remove slow drifts. No other preprocessing was performed. The following questions were addressed:
 
 \begin{enumerate}
-    \item Confusion matrix: Which image categories yield similar brain activation patterns?
+    \item Confusion matrix: Which image categories lead to similar brain activation patterns?
     \item Time classification: How does classification performance evolve across time following stimulus onset?
-    \item Searchlight analysis: Which of the brain regions contain discriminative information that discriminates between faces vs houses?
+    \item Searchlight analysis: Which of the brain regions contain discriminative information that discerns between faces and houses?
 \end{enumerate}
 
- Leave-one-session-out cross-validation is used to calculate classification performance. Multi-class LDA with 8 classes with automatic shrinkage regularization serves as a classifier. For the searchlight analysis, binary LDA contrasting faces vs houses is used with AUC serving as metric. The searchlight consists of a 3x3x3 cube of voxels that is centered on each target voxel. A level 2 cluster permutation test is computed on the AUC values again a null hypothesis that AUC is equal to 0.5. 
+ Leave-one-session-out cross-validation was used to calculate classification performance. Multi-class LDA with 8 classes served as a classifier. For the searchlight analysis, binary LDA contrasting faces vs houses was used with AUC serving as metric. The searchlight consisted of a 3x3x3 cube of voxels that was centered on each target voxel. A level 2 cluster permutation test was computed on the AUC values against the null hypothesis that AUC equals 0.5. 
 
 \red{\subsection{Benchmarking}}
 
 %In multi-dimensional neuroimaging data, a model needs to be trained on a single subject's data potentially thousands of times. This is exacerbated in permutation testing, when this process needs to be repeated hundreds or thousands of times. 
-Multivariate analyses can involve hundreds or even thousands of train/test iterations. Therefore,  training time (the time required to fit a single model on training data) is a relevant quantity when evaluating different model implementations. To benchmark MVPA-Light's models, their training time is compared to other MATLAB implementations as well as models implemented in Python (Scikit Learn package) and R (different bespoke packages). The comparison to other MVPA toolboxes is less relevant since they often rely on external packages such as LIBSVM and LIBLINEAR which are also available in MVPA-Light (this applies to e.g. DDTBOX, PRoNTo, TDT). The following three datasets are considered:
+Multivariate analyses can involve hundreds or even thousands of train/test iterations. Therefore,  training time (the amount of time required to fit a single model on data) is a relevant quantity when evaluating different model implementations. To benchmark MVPA-Light's models, their training time was compared to models in the MATLAB Statistics Toolbox as well as models Python (Scikit Learn package) and R (different packages). The comparison to other MVPA toolboxes is of less relevance since they often rely on external packages such as LIBSVM and LIBLINEAR which are also available in MVPA-Light (this applies to e.g. DDTBOX, PRoNTo, TDT). The following three datasets were considered:
 
 %A key variable to computational efficiency is training speed, that is, the amount of time needed to optimize the model parameters on training data. 
 
 \begin{itemize}
-    \item MEG single-subjects. The \cite{Wakeman2015ADataset} dataset is used with the famous vs scrambled faces condition, epoched in the range [-0.2, 1] s. Data dimensions are 585--592 trials, 306 channels, and 265 time points. MVPA is performed for every subject and every time point separately, using channels as features.
-    \item MEG super-subject. The trials of all MEG subjects are concatenated to form a single 'super-subject' dataset comprising 9,421 trials, 306 channels, and 265 time points. MVPA is performed for every time point, using channels as features.
-    \item fMRI. For each subject in the \cite{Haxby2001} subject, all voxels with a non-zero signal are concatenated to a single feature vector. The classes face and houses are considered, yielding a data matrix of 216 samples (198 for subject 5) and between 163,665 and 163,839 voxels per subject. MVPA is performed for every subject separately, using voxels as features.
+    \item MEG single-subjects. The \cite{Wakeman2015ADataset} dataset was used with the famous vs scrambled faces conditions, epoched in the range [-0.2, 1] s. Data dimensions were 585--592 trials, 306 channels, and 265 time points. MVPA was performed for every subject and every time point separately, using channels as features.
+    \item MEG super-subject. Trials of all subjects in the MEG single-subjects data were concatenated to form a single 'super-subject' dataset comprising 9,421 trials, 306 channels, and 265 time points. MVPA was performed for every time point, using channels as features.
+    \item fMRI. For each subject in the \cite{Haxby2001} data, all voxels with a non-zero signal were concatenated to a single feature vector. The classes face vs house were considered, yielding a data matrix of 216 samples (198 samples for subject 5) and between 163,665 and 163,839 voxels per subject. MVPA was performed for every subject separately, using voxels as features.
 \end{itemize}
 
-The MEG single-subjects dataset is of a typical size for neuroimaging data and thus serves as a benchmark for ordinary operation. The other two datasets test the computational limits of the models by using either a large number of trials (MEG super-subject) or a large number of features (fMRI). For the single-subjects dataset, classification performance is assessed in addition to timing.
-To be as unbiased as possible, hyperparameters are mostly unchanged except when a change makes the models more comparable across toolboxes (e.g. setting the same regularization value). No hyperparameter tuning is performed in order to quantify pure training time.
+The MEG single-subjects dataset is of standard size for neuroimaging data and thus serves as a benchmark for ordinary operation. The other two datasets are intended to test the computational limits of the models by using either a large number of trials (MEG super-subject) or a large number of features (fMRI). For the single-subjects dataset, classification performance was measured in addition to training time.
+To be as unbiased as possible, hyperparameters were mostly unchanged except when a change made the models more comparable across toolboxes (e.g. setting the same regularization value). No hyperparameter tuning was performed in order to quantify pure training time.
 
-The MVPA-Light models are compared to MATLAB 2019a's fitcdiscr (LDA), lassoglm (LogReg), fitcnb (Naive Bayes), fitcsvm (SVM), ridge, and fitrsvm (SVR). Python and R-based toolboxes are installed in virtual environments using Anaconda 4.7.12. Scikit Learn 0.21.2 is used together with Python 3.7.3. R version 3.6.1 is used with packages MASS (LDA), glmnet (LogReg and Ridge), e1071 (Naive Bayes, SVM, SVR), listdtr (Kernel Ridge).
+The MVPA-Light models were compared to LIBSVM,  LIBLINEAR, and MATLAB 2019a's fitcdiscr (LDA), lassoglm (LogReg), fitcnb (Naive Bayes), fitcsvm (SVM), ridge, and fitrsvm (SVR). Python and R-based toolboxes were installed in virtual environments using Anaconda 4.7.12. Scikit Learn 0.21.2 was used together with Python 3.7.3. R version 3.6.1 was used with packages MASS (LDA), glmnet (LogReg and Ridge), e1071 (Naive Bayes, SVM, SVR), and listdtr (Kernel Ridge).
 
-All analyses are conducted after a fresh restart of a Desktop computer with networking disabled. It has a Intel Core i7-6700 @ 3.40 GHz x 8 CPU with 64 GB RAM running on Ubuntu 18.04. All scripts are available in the accompanying GitHub repository\footnote{https://github.com/treder/MVPA-Light-Paper}. 
+All analyses were conducted after a fresh restart of a desktop computer with networking disabled. The computer had an Intel Core i7-6700 @ 3.40 GHz x 8 CPU with 64 GB RAM running on Ubuntu 18.04. All scripts are available in the accompanying GitHub repository\footnote{https://github.com/treder/MVPA-Light-Paper}. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% -------- RESULTS --------   %%
@@ -583,14 +580,14 @@ All analyses are conducted after a fresh restart of a Desktop computer with netw
 
 \textit{ERP classification}. The bar graph shows that for both the N170 and the sustained ERP component classification accuracy is significantly above the chance level of 33\%. Accuracy is a summary measure that can be broken down into confusion matrices that show which combinations of classes get misclassified ('confused'). For both N170 and the sustained ERP component, the highest accuracy is obtained for the scrambled images. Moreover,  misclassification (off-diagonal elements) is most prominent for the famous and unfamiliar faces. This is not surprising since both types of images are identical in terms of low-level features and both show actual faces, in contrast to the scrambled images. 
 
-\textit{Time classification}. AUC is plotted as a function of time for famous vs scrambled images. The classification was repeated for the three channel sets. The classes are not discriminable prior to the occurrence of the N170. A classification peak at the time of the N170 can be seen for all channel sets. At this stage, the AUC values diverge, with EEG yielding a significantly lower AUC. Combining EEG+MEG seems to yield slightly higher performance than MEG alone.
+\textit{Time classification}. AUC is plotted as a function of time for famous vs scrambled images. The classification was repeated for the three channel sets. The classes are not discriminable prior to the occurrence of the N170. A classification peak at the time of the N170 can be seen for all channel sets. At this stage, the AUC values diverge, with EEG yielding a significantly lower AUC. Combining EEG+MEG seems to yield a slightly higher performance than MEG alone.
 
 \textit{Time-frequency classification}. AUC is plotted as a function of both time and frequency. The AUC values are color-coded. For famous vs scrambled faces, peak performance is reached in the delta frequency band at a latency between 0.2 and 0.4 s. For famous vs unfamiliar faces, peak performance is attained in the latter half of the trial (0.5 - 1 s) in the theta and alpha frequency bands. 
 
 \textit{Generalization}. The first plot depicts AUC (color-coded) as a function of the training time (y-axis) and testing time (x-axis). There is evidence for widespread time generalization starting about at the time of the N170 peak and covering most of the remaining trial. In particular, there is generalization between the N170 and the later sustained component (horizontal and vertical lines emanating at 0.17 s), suggesting some correlation between the spatial pattern of the N170 and the sustained component. 
 The second plot depicts AUC as a function of frequency. The is some generalization in the theta band (lower-left corner), the alpha band, and the lower beta band (16--22 Hz). Also, when the classifier is trained in the beta band, classification performance partially generalizes to the alpha band. However, the overall performance is low when compared to the time-locked data. 
 
-\red{\textit{Level 2 statistics}. Group statistical analysis of the time-frequency classification data in the panel above. Images depict the AUC values masked by significance (deep blue = not significant). Non-significant areas are marked in deep blue. For the famous vs scrambled faces classification, a large cluster spanning the whole trial and especially the low frequency bands is evident. For the famous vs unfamiliar faces condition, there is a significant  cluster corresponding to large AUC values after 0.5 s and in the lower frequency range.}
+\red{\textit{Level 2 statistics}. Group statistical analysis is shown based on the time-frequency classification data in the panel above. Images depict AUC values masked by significance (deep blue = not significant). For the famous vs scrambled faces classification, a large cluster spanning the whole trial and especially the low frequency bands is evident. For the famous vs unfamiliar faces condition, there is a significant  cluster corresponding to large AUC values after 0.5 s and in the lower frequency range.}
 
 \red{\textit{Level 1 statistics}. Images depict the AUC values masked by significance. Both uncorrected tests (binomial and permutation test) exhibit spurious effects even at pre-stimulus time. Most of these spurious effects disappear under the cluster permutation test.}
 
@@ -599,27 +596,27 @@ The second plot depicts AUC as a function of frequency. The is some generalizati
 \prettyref{fig:fmri_results} depicts the results of the MVPA on the fMRI data, averaged across subjects.
 
 \textit{Confusion matrix}. A mask provided with the data was applied to select voxels from ventral temporal areas. 
-A high overall performance was obtained for LDA with 8 classes. Misclassifications tend to be confined to within categories. For instance, misclassified faces tend to be labelled as cats (both living objects), whereas misclassified non-living objects tend to be labeled as other non-living objects. This indicates shared representations for images from the same general category.
+A high overall performance is observed for LDA with 8 classes. Misclassifications tend to be confined to within more general semantic categories. For instance, misclassified faces tend to be labeled as cats (both living objects), whereas misclassified non-living objects tend to be labeled as other non-living objects. This indicates that there are shared representations for images from the same general category.
 
-\textit{Time classification}. Multi-class classification accuracy was calculated for each time point following stimulus onset. Solid lines show the means across subjects and the shaded areas correspond to standard error. Masks  were used to select voxels in the ventral temporal area, voxels responsive to faces, or voxels responsive to houses. Although all ROIs and time points yield performances above the chance level of 12.5\%, the ventral temporal area (which comprises both face and house responsive voxels) yields the best performance. For the latter, classification performance peaks at about 5 s after stimulus onset.
+\textit{Time classification}. Multi-class classification accuracy was calculated for each time point following stimulus onset. Solid lines show the means across subjects and the shaded areas correspond to standard error. Masks were used to select voxels in the ventral temporal area, voxels responsive to faces, or voxels responsive to houses. Although all ROIs and time points yield performances above the chance level of 12.5\%, the ventral temporal area (which comprises both face and house responsive voxels) yields the best performance. For the latter, classification performance peaks at about 5 s after stimulus onset.
 
 \textit{Searchlight analysis}. AUC values averaged across subjects are depicted. The AUCs are masked by the significant cluster ($p < .01$) and overlayed on an averaged anatomical MRI. Although the cluster is large, high values $>0.8$ are predominantly found in dorsal and ventral visual areas including the paraphippocampal place area and the fusiform area, nicely dovetailing with the original findings of \cite{Haxby2001}.
 
 \red{\subsubsection{Benchmarking}}
 
-\prettyref{fig:benchmarking} depicts classification accuracy on the \cite{Wakeman2015ADataset} data calculated for different classifiers and different toolboxes. Except for the MATLAB classifiers, nearly identical results are obtained for all implementations of LDA, LogReg, and linear SVM, with a peak performance of about 75\%. A lower performance is obtained for Naive Bayes, but this is consistent across different implementations. For SVM with a RBF kernel, the best performance is obtained in R, followed MATLAB, with both MVPA-Light and Scikit Learn performing worse. Note that no hyperparameter tuning is performed, so the latter result might be explicable by a more suitable setting of hyperparameters for the given dataset. \prettyref{tab:classification} shows the timing results for different classifiers and \prettyref{tab:regression} shows the results for different regression models. 
+\prettyref{fig:benchmarking} depicts classification accuracy on the \cite{Wakeman2015ADataset} data calculated for different classifiers and different toolboxes. Except for the MATLAB classifiers, results are nearly identical  for all implementations of LDA, LogReg, and linear SVM, with a peak performance of about 75\%. Lower performance is evident for Naive Bayes, but consistently so across different implementations. For SVM with a RBF kernel, the best performance is obtained in R, followed MATLAB, with both MVPA-Light and Scikit Learn performing worse. Since no hyperparameter tuning was performed, the latter result is most likely due to differences in the default hyperparameters. \prettyref{tab:classification} and \prettyref{tab:regression} show the timing results for different classifiers and regression models. These results are discussed model by model:
 
-\textit{LDA}. The MVPA-Light implementation of LDA consistently outperforms all other implementations in terms of speed, in some cases by orders of magnitude. For the fMRI dataset, it is almost 100 times faster than Scikit Learn, whereas MATLAB and R both run out of memory. It is worth noting that a shrinkage value of 0.01 is applied for the MVPA-Light and MATLAB implementations. For R, low performance is achieved with rda (regularized LDA), so the standard unregularized LDA is used. For Scikit Learn, the default solver does not allow for shrinkage so no shrinkage is applied. 
+\textit{LDA}. The MVPA-Light implementation consistently outperforms other implementations in terms of speed (i.e., lowest training time), in some cases by orders of magnitude. For the fMRI dataset, it is almost 100 times faster than Scikit Learn, whereas MATLAB and R both run out of memory. It is worth noting that a shrinkage value of 0.01 was applied for the MVPA-Light and MATLAB implementations. For R, low performance was achieved with rda (regularized LDA), so the standard unregularized LDA was used. For Scikit Learn, the default solver does not allow for shrinkage so no shrinkage was applied.
 
-\textit{LogReg}. The MVPA-Light implementation of Logistic Regression outperforms other candidates for the MEG single-subjects data. It is outperformed by the R implementation for the MEG super-subject data and causes an out of memory error for the fMRI data.
+\textit{LogReg}. The MVPA-Light implementation of Logistic Regression outperforms the competitors for the MEG single-subjects data. It is outperformed by the R implementation for the MEG super-subject. For the fMRI data, it causes an out of memory error and the best performing model is LIBLINEAR.
 
-\textit{Naive Bayes}. MVPA-Light's Naive Bayes consistently outperforms the other implementations, in some cases by orders of magnitude. The only other implementation yielding acceptable performance also for big datasets is Scikit Learn.
+\textit{Naive Bayes}. The MVPA-Light implementation consistently outperforms other implementations, in some cases by orders of magnitude. Scikit Learn is consistently second best, followed by R and MATLAB.
 
-\textit{SVM}. For linear SVM, LIBLINEAR yields the best training speed except for the fMRI data, where MVPA-Light performs best. MVPA-Light's SVM consistently outperforms the other candidates, closely followed by the MATLAB. Large differences are obtained for different platforms, with R being the slowest in many cases.
+\textit{SVM}. For linear SVM, LIBLINEAR yields the best training speed except for the fMRI data, where MVPA-Light performs best. For RBF kernels, MVPA-Light's SVM consistently outperforms the competitors, closely followed by MATLAB's fitcsvm. Significant differences are obtained for different toolboxes, with R being the slowest in many cases. The good performance of MVPA-Light's SVM may appear surprising at first glance, given some of its contenders run using C code. First, MVPA-Light uses a coarse tolerance value; this implies that its algorithm might perform fewer iterations than LIBSVM, although this has not been investigated. As \prettyref{fig:benchmarking} shows, if this is the case, it does not seem to be detrimental to classification performance. Second, the advantages of LIBSVM might not play out during a single training iteration. It has an integrated cross-validation procedure, which is likely to be substantially faster than cross-validation using MVPA-Light, although this has not been investigated either.
 
-\textit{Ridge and Kernel Ridge}. MVPA-Light's models lead the table except for the fMRI data, where Scikit Learn's kernel ridge outperforms MVPA-Light. No results are available for R's krr model -- it does not appear to have an interface for fixing hyperparameters and instead performs an expensive search using leave-one-out cross-validation.
+\textit{Ridge and Kernel Ridge}. MVPA-Light's models lead the field except for the fMRI data, where Scikit Learn's kernel ridge outperforms MVPA-Light. No results are available for R's krr model; it does not appear to have an interface for fixing hyperparameters and instead performs an expensive search using leave-one-out cross-validation, so it was omitted.
 
-\textit{SVR, linear and RBF}. LIBSVM leads closely followed by (in one case beaten by) MATLAB. R yields the slowest implementation. 
+\textit{SVR}. MVPA-Light exclusively relies on LIBSVM for SVR, which leads the field except for one case, in which it closely trails the MATLAB implementation. Overall, R yields the slowest implementation. 
 
 \begin{table}
 \footnotesize
@@ -664,7 +661,7 @@ A high overall performance was obtained for LDA with 8 classes. Misclassificatio
 \cline{2-7}
   & R & OOM & $7.1\pm1.13$ & $18.48\pm0.35$ & $39.67\pm1.98$ & $43.3\pm2.18$ \\\hline
 \end{tabular}
-\caption{Mean training time and standard deviation in seconds for different classifiers. For each combination of dataset and classifier, the fastest model is marked in bold. Abbreviations: OOM = out of memory error, (p) = primal form, (d) = dual form.}
+\caption{Benchmarking results: Mean training time and standard deviation in seconds for different classifiers. For each combination of dataset and classifier, the fastest model is marked in bold. Abbreviations: OOM = out of memory error, (p) = primal form, (d) = dual form.}
 \label{tab:classification}
 \end{table}
 
@@ -706,7 +703,7 @@ A high overall performance was obtained for LDA with 8 classes. Misclassificatio
 \cline{2-6}
   & R & $7.503\pm0.593$ & - & $37.211\pm2.056$ & $41.037\pm2.298$\\\hline
 \end{tabular}
-\caption{Training time for different regression models.}
+\caption{Benchmarking results: Training time for different regression models.}
 \label{tab:regression}
 \end{table}
 
@@ -715,33 +712,29 @@ A high overall performance was obtained for LDA with 8 classes. Misclassificatio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
 
-MVPA-Light offers a suite of classifiers, regression models and metrics for multivariate pattern analysis. In addition, a high-level interface allows to carry out common MVPA tasks such as cross-validated classification across time,  generalization, and searchlight analysis. The toolbox supports hyperparameter tuning and pre-computed kernels. \red{The statistical significance of the MVPA result can be established using level 1 and level 2 tests.} Since the toolbox is entirely statistical (i.e. it just operates on data matrices), it can easily be combined with MATLAB-based neuroimaging toolboxes. 
+MVPA-Light offers a suite of classifiers, regression models and metrics for multivariate pattern analysis. In addition, a high-level interface allows to carry out common MVPA tasks such as cross-validated classification across time,  generalization, and searchlight analysis. The toolbox supports hyperparameter tuning and pre-computed kernels. \red{The statistical significance of the MVPA result can be established using level 1 and level 2 tests.} 
+%Since the toolbox is entirely statistical (i.e. it just operates on data matrices), it can easily be combined with MATLAB-based neuroimaging toolboxes. 
 
 % Preprocessing
-It also provides a nested preprocessing pipeline that applies operations to training and test sets separately. Among others, it features over- and undersampling, PCA, and scaling operations. It also includes an averaging approach wherein samples are assigned to groups and then averaged in order to increase signal-to-noise ratio. For linear classifiers, this approach has been explored by \citep{Cichy2015,Cichy2017MultivariateSpace}. Recently, it has been generalized to non-linear kernel methods \citep{Treder2018}. Either approach can be used in the toolbox by adding the operation \ttt{average\_samples} or \ttt{average\_kernel} to the preprocessing pipeline. 
-
+MVPA-Light also provides a nested preprocessing pipeline that applies operations to training and test sets separately. Among others, it features over- and undersampling, PCA, and scaling operations. It also includes an averaging approach wherein samples are assigned to groups and then averaged in order to increase signal-to-noise ratio. For linear classifiers, this approach has been explored by \citep{Cichy2015,Cichy2017MultivariateSpace}. Recently, it has been generalized to non-linear kernel methods \citep{Treder2018}. Either approach can be used in the toolbox by adding the operation \ttt{average\_samples} or \ttt{average\_kernel} to the preprocessing pipeline. 
 % Wakeman & Henson and Haxby analysis
-To showcase some of its features, analyses of an MEEG \citep{Wakeman2015ADataset} and an fMRI \citep{Haxby2001} dataset have been reported. The results illustrate some ways in which the toolbox can aid in quantifying the similarity of representations, measuring the information content, localizing discriminative information in the time-frequency plane, highlighting shared representations across different time points or frequencies, and establishing statistical significance.
+To showcase some of its features, analyses of an MEEG \citep{Wakeman2015ADataset} and an fMRI \citep{Haxby2001} dataset are reported. The results illustrate some ways in which the toolbox can aid in quantifying the similarity of representations, measuring the information content, localizing discriminative information in the time-frequency plane, highlighting shared representations across different time points or frequencies, and establishing statistical significance.
 
 % Benchmarking
-\todo{discuss benchmarking}
+\red{A benchmarking analysis was conducted on three different datasets in order to compare MVPA-Light (including LIBSVM and LIBLINEAR) to models provided in the MATLAB Statistics Toolbox, various R packages, and the Scikit Learn package in Python. While classification performance is largely consistent across different platforms, training time varies considerably. The MVPA-Light implementations of LDA, Naive Bayes, and Ridge Regression consistently outperform  their competitors, in some cases by orders of magnitude. For Logistic Regression and SVM, the MVPA-Light implementations and LIBLINEAR lead the field. In all but one case, MVPA-Light's classifiers are faster than the contenders in MATLAB, R, and Scikit Learn. Overall, the fastest classifier is MVPA-Light's LDA and the fastest regression model is MVPA-Light's Ridge Regression. Partially, the success of MVPA-Light is due to specialization: MVPA-Light models tend to have fewer hyperparameters than other models, and MVPA-Light features separate optimized implementations for binary LDA and multi-class LDA, whereas the other toolboxes have a single implementation. Furthermore, MVPA-Light's LDA and Ridge Regression dynamically switch between primal and dual form. This can increase computational efficiency especially when dealing with a large datasets.}
+
+\red{The benchmarking results should not be interpreted as final verdicts on the respective toolboxes. 
+ Undoubtedly, training speed can be improved by finding an optimal set of hyperparameters for a model. For instance, increasing regularization tends to lead to smoother loss surfaces and often faster convergence for gradient descent algorithms. The strategy for the present analysis was to change default parameters minimally and, if so, only in order to increase comparability, e.g. by setting a regularization parameter to a common value. 
+ Although MVPA-Light will likely perform well in other situations, too, the present results are mostly indicative of \textit{default performance}, obtained with minimal user interference. This is a relevant measure since it is our belief that the burden of hyperparameter selection should be taken off the user as much as possible.}
 
 
-
-
-The benchmarking analysis ... shows ... largely consistent decoding performance across models and software packages. It is possible that differences can be further reduced with optimal hyperparameter tuning. In terms of training speed, ... there were clear differences both between and within model classes ... On the fMRI data (few samples, many features), kernel classifiers were among the fastest ... This is not surprising ... since their complexity grows mainly with the number of samples, not the number of features. ... The reverse pattern is found for the MEG super-subject (few features, many samples) data ...
-
-Notably, MVPA-Light's binary LDA and ridge regression are the only models in their respective model classes to perform consistently well on both the MEG and the fMRI data. This suggests that they might be applicable to a wide range of MVPA tasks. To a significant extent, this can be attributed to their automatic switching between primal and dual data representations.
-
-
-Note that the benchmarking results need to be taken with a pinch of salt. Implementations of the same model in different software packages can use different solvers, different regularization techniques, and have a different set of hyperparameters and capabilities that may cause additional overhead during optimization.
-
-These results should not be interpreted as final verdicts on the corresponding models. Undoubtedly, training speed for some of the models can be improved by finding the optimal setting of hyperparameters. For instance, further increasing the amount of regularization leads to smoother loss surfaces and often faster convergence for gradient descent algorithms. The strategy taken was to change default parameters minimally and only in order to assure increase comparability across different software packages, e.g. by setting a regularization hyperparameters to a common value. Therefore, the results can be seen as indicative of \textit{default performance}, obtained with minimal user interference. This is a relevant measure since it is our belief that the burden of hyperparameter selection should be taken off the user as much as possible.
+%Implementations of the same model in different software packages can use different solvers, different regularization techniques, and have a different set of default hyperparameters and capabilities that may cause additional overhead during optimization.
+%These results should not be interpreted as final verdicts on the corresponding models. 
 
 % % Statistics
 % Second-level statistical analyses are not currently covered by the toolbox. Such statistics can be obtained by combining e.g. the cluster permutation statistics framework in FieldTrip \citep{Maris2007} with MVPA-Light. For single subjects, a binomial test for accuracy is implemented in the function \ttt{mv\_statistics}. For the future, it is planned to include a second-level statistical framework based on cluster permutation tests directly in the toolbox. Since permutation tests are computationally expensive, the framework is planned to include recent developments such as a fast permutation scheme for LDA and kernel FDA \citep{Treder2019DirectFDA}.
 
-Concluding, MVPA-Light is a comprehensive toolbox for multivariate pattern analysis. Its models perform competitively compared to other implementations. Future development of MVPA-Light will include additional feature extraction techniques for oscillations, such as Common Spatial Patterns \citep{Blankertz2008a} and the Riemannian geometry approach \citep{Barachant2013}, and computational improvements for the classifiers, for instance via a faster calculation of the regularization path for hyperparameter tuning in SVM \citep{Hastie2004TheMachine}.
+Concluding, MVPA-Light is a comprehensive toolbox for multivariate pattern analysis. Its models perform competitively compared to other implementations. Future development of MVPA-Light will include additional feature extraction techniques for oscillations, such as Common Spatial Patterns \citep{Blankertz2008a} and the Riemannian geometry approach \citep{Barachant2013}, and further computational improvements, for instance via a faster calculation of the regularization path for hyperparameter tuning in SVM \citep{Hastie2004TheMachine}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% --------- APPENDIX ---------
