@@ -1,8 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is just an example/guide for you to refer to when submitting manuscripts to Frontiers, it is not mandatory to use Frontiers .cls files nor frontiers.tex  %
 % This will only generate the Manuscript, the final article will be typeset by Frontiers after acceptance.   
-%                                              %
-%                                                                                                                                                         %
+%
+%                                                                                                                                   
+%
 % When submitting your files, remember to upload this *tex file, the pdf generated with it, the *bib file (if bibliography is not within the *tex) and all the figures.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -119,7 +120,7 @@
 
 %%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
 \section{}
-MVPA-Light is a MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of a range of classifiers (LDA, Logistic Regression, SVM, kernel FDA, Naive Bayes, ensemble methods) and regression models (ridge, kernel ridge), using modern optimization algorithms. High-level functions allow for the multivariate analysis of multi-dimensional data, including generalization (e.g. time x time) and searchlight analysis. The toolbox performs  cross-validation, hyperparameter tuning, and nested preprocessing. It computes various classification and regression metrics and establishes their statistical significance. It is modular, easily extendable, and is shipped with sample data and example scripts. Furthermore, it offers interfaces for LIBSVM and LIBLINEAR as well as an integration into the FieldTrip neuroimaging toolbox.
+MVPA-Light is a MATLAB toolbox for multivariate pattern analysis (MVPA). It provides native implementations of a range of classifiers and regression models, using modern optimization algorithms. High-level functions allow for the multivariate analysis of multi-dimensional data, including generalization (e.g. time x time) and searchlight analysis. The toolbox performs cross-validation, hyperparameter tuning, and nested preprocessing. It computes various classification and regression metrics and establishes their statistical significance. It is modular, easily extendable, and is shipped with sample data and example scripts. Furthermore, it offers interfaces for LIBSVM and LIBLINEAR as well as an integration into the FieldTrip neuroimaging toolbox. \red{This paper introduces MVPA-Light, presents example analyses on MEG and fMRI datasets, and reports benchmarking results on the classifiers and regression models.}
 
 
 
@@ -134,12 +135,12 @@ MVPA-Light is a MATLAB toolbox for multivariate pattern analysis (MVPA). It prov
 During the early 2010s, multivariate pattern analysis (MVPA) became a mainstream statistical tool in EEG/MEG research \citep{Blankertz2011,Lemm2011,Mur2009,Grootswagers2017DecodingData,Pereira2009,Varoquaux2017}. It can be considered as a complement to the set of traditional statistical tools available to researchers (e.g. t-test, ANOVA). MVPA is particularly suited to large, multivariate datasets. Furthermore, since many classifiers make few or no assumptions about the data distribution, and statistical significance is often established using permutation tests, MVPA can be considered as a set of non-parametric statistical tools.
 One of the primary applications of MVPA is \textit{classification}. In classification, an algorithm called \textit{classifier} takes a multivariate pattern of brain activity (referred to as \textit{features}) as input and maps it onto a categorical brain state or experimental condition (referred to as \textit{class label}). In other words, the task of a classifier is to predict class labels given features. The terms classification/classifier are also known as decoding/decoder in the cognitive neuroscience literature. It is worth noting that classification is often performed at the level of individual participants, taking trials as data samples. The classifier output then corresponds to predictions for single trials. Another important application of MVPA is \textit{regression}. It shares many characteristics with classification, but it maps features onto a continuous variable (e.g. reaction time) referred to a \textit{responses} rather than class labels. Consequently, predictions of the regression model are continuous  (e.g. predicted reaction time given a brain pattern).
 
-A number of excellent MATLAB toolboxes for MVPA have been developed over the years, including the Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Berlin BCI toolbox \citep{Blankertz2016TheControl}, CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}, Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and The Decoding Toolbox (TDT) \citep{Hebart2015TheData}. Beyond MATLAB, the probably most popular computer languages for machine learning are Python and R, with outstanding toolboxes such as Scikit Learn \citep{Pedregosa2011Scikit-learn:Python} for Python and Caret \citep{Kuhn2008BuildingPackage} and MLR \citep{Bischl2000Mlr:R} for R. A comprehensive comparison of MVPA-Light with all of these toolboxes is beyond the scope of this paper, but we believe that what sets MVPA-Light apart is the adherence to all of the following design principles: 
+A number of excellent MATLAB toolboxes for MVPA have been developed over the years, including the Amsterdam Decoding and Modelling Toolbox (ADAM) \citep{Fahrenfort2018FromADAM}, BCILAB \citep{Kothe2013BCILAB:Development}, Berlin BCI toolbox \citep{Blankertz2016TheControl}, CoSMoMVPA \citep{Oosterhof2016CoSMoMVPA:Octave}, Decision Decoding ToolBOX (DDTBOX) \citep{Bode2019ThePotentials}, Donders Machine Learning Toolbox (DMLT) (\texttt{github.com/distrep/DMLT}), Pattern Recognition for Neuroimaging Toolbox (PRoNTo) \citep{Schrouff2013PRoNTo:Toolbox}, and The Decoding Toolbox (TDT) \citep{Hebart2015TheData}. Beyond MATLAB, the probably most popular computer languages for machine learning are Python and R, with outstanding toolboxes suchhttps://www.overleaf.com/project/5d4bf538b51f0f7b324743c3 as Scikit Learn \citep{Pedregosa2011Scikit-learn:Python} for Python and Caret \citep{Kuhn2008BuildingPackage} and MLR \citep{Bischl2000Mlr:R} for R. A comprehensive comparison of MVPA-Light with all of these toolboxes is beyond the scope of this paper, but what sets it apart is the adherence to all of the following design principles: 
 
 \begin{itemize}
 \item \textit{self-contained}: unlike many toolboxes that provide wrappers for existing classifiers, the backbone of MVPA-Light is  native implementations of various classifiers, regression models, and their corresponding optimization algorithms (Trust-Region Newton, Dual Coordinate Descent). As a result, MVPA-Light works out-of-the-box, without the need for additional toolboxes or  code compilation.
 \item \textit{transparent}: the toolbox has a shallow code base with well-documented functions. In many cases, the function call stack has a depth of two within the toolbox. For instance, a call to \texttt{mv\_classify} using an LDA classifier triggers calls to functions such as  \texttt{mv\_check\_inputs}, \texttt{train\_lda} and \texttt{test\_lda}. Although the train/test functions might call additional optimization functions, most of the work is done at these two shallowest levels. To preserve the shallowness, high-level functions replicate some code that might be shared otherwise. Furthermore, object orientation and encapsulation is avoided in favour of the more transparent MATLAB structs.
-\item \textit{fast}: all models and high-level functions are written with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, Logistic Regression and SVM use iterative optimization algorithms written in MATLAB. However, these algorithms run faster using compiled code. To this end, an interface is provided for LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008}, two excellent C implementations of Logistic Regression and SVM for users who do not shy away from compiling the code on their platform.
+\item \textit{fast}: all models and high-level functions are written with speed as a prime concern. In some cases, the need for speed conflicts with the out-of-the-box requirement. For instance, Logistic Regression and SVM use iterative optimization algorithms written in MATLAB. However, these algorithms run faster using compiled code. To this end, an interface is provided for LIBSVM \citep{Chang2011LIBSVM:Machines} and LIBLINEAR \citep{Fan2008}, two C implementations of Logistic Regression and SVM for users who do not shy away from compiling the code on their platform.
 \item \textit{modular and pluggable}: it is possible, and intended, to harvest parts of the code such as the classifiers for other purposes. It is also easy to plug the toolbox into a larger EEG/MEG processing framework. An interface for FieldTrip \citep{Oostenveld2011} is described in the Methods section.
 \item \textit{high-level interface}: common MVPA tasks such as searchlight analysis and time generalization including cross-validation can be performed with a few lines of MATLAB code. Many of the hyperparameters required by classifiers and regression models can be set to 'auto'; the parameters are then automatically selected by MVPA-Light, taking the burden of hyperparameter selection off the user. For an effortless start, a small EEG dataset and example scripts are shipped with the toolbox.
 \end{itemize}
@@ -150,7 +151,7 @@ It is worth noting that MVPA-Light is a purely statistical toolbox. That is, it 
 
 MVPA-Light is shipped with a set of example scripts (in the \ttt{/examples} subfolder) and an example EEG dataset. These scripts cover both the high-level functions in MVPA-Light and calling the train/test functions manually. The best starting point is to work through the example scripts and then adapt them to one's purpose. An up-to-date introduction to the toolbox with relevant hyperlinks is provided on the GitHub page (\ttt{github.com/treder/mvpa-light}).
 
-The EEG data has been taken from the  BNCI-Horizon-2020 repository (http://bnci-horizon-2020.eu/database). It consists of three \ttt{mat} files corresponding to three subjects (subject codes \ttt{VPaak}, \ttt{VPaan}, and \ttt{VPgcc}) from the auditory oddball \red{paradigm} introduced in \cite{Treder2014}. Out of the experimental conditions, the "SynthPop" condition has been selected. Attended and unattended deviants are coded as class 1 and 2. The 64 EEG channels in the original dataset have been reduced to 32 channels.
+The EEG data has been taken from the  BNCI-Horizon-2020 repository (http://bnci-horizon-2020.eu/database). It consists of three \ttt{mat} files corresponding to three subjects (subject codes \ttt{VPaak}, \ttt{VPaan}, and \ttt{VPgcc}) from the auditory oddball paradigm introduced in \cite{Treder2014}. Out of the experimental conditions, the "SynthPop" condition has been selected. Attended and unattended deviants are coded as class 1 and 2. The 64 EEG channels in the original dataset have been reduced to 32 channels.
 
 To give a concrete code example, consider a [samples x channels] data matrix for one participant, where the samples correspond to trials and the channels serve as features. The matrix is denoted as \ttt{X}. Each trial corresponds to either condition 1 (e.g. oddball sound) or condition 2 (standard sound). This is encoded in a vector of class labels, denoted as \ttt{clabel}, that contains 1's and 2's. Then the following piece of code performs 10-fold cross-validation with 2 repetitions. LDA is used as classifier and area under the ROC curve (AUC) is calculated as a classification metric.
 
@@ -208,7 +209,7 @@ To obtain a realistic estimate of classification or regression performance and c
     \item \ttt{cfg.k}: number of folds in k-fold cross-validation.
     \item \ttt{cfg.repeat}: number of times the cross-validation is repeated with new randomly assigned folds.
     \item \ttt{cfg.p}: if \ttt{cfg.cv = 'holdout'}, \ttt{p} is the fraction of test samples.
-    \item \red{\ttt{cfg.fold}: if \ttt{cfg.cv = 'predefined'}, fold is a vector that  specifies which fold a sample belongs to.}
+    \item \ttt{cfg.fold}: if \ttt{cfg.cv = 'predefined'}, fold is a vector that  specifies which fold a sample belongs to.
     \item \ttt{cfg.stratify}: if 1, for classification, the class proportions are approximately preserved in each test fold.
 \end{itemize}
 
@@ -233,30 +234,30 @@ cfg.preprocess = {'undersample', 'zscore', 'average_kernel'}
 adds a preprocessing pipeline that perfoms undersampling of the data followed by z-scoring and kernel averaging.
 
 %%% ------- SEARCHLIGHT -------
-\subsubsection{\red{Searchlight analysis}}\label{sec:searchlight}
+\subsubsection{Searchlight analysis}\label{sec:searchlight}
 
-\red{In neuroimaging analysis, a question such as "Does brain activity differentiate between faces and houses?" is usually less interesting than the question "\textit{Which brain regions} differentiate between faces and houses?". In other words, the goal of MVPA is to establish the presence of a significant difference \textit{and} localize it in space and/or time.}
+In neuroimaging analysis, a question such as "Does brain activity differentiate between faces and houses?" is usually less interesting than the question "\textit{Which brain regions} differentiate between faces and houses?". In other words, the goal of MVPA is to establish the presence of a significant difference \textit{and} localize it in space and/or time.
 
-\red{Classical univariate approaches such as t-tests offer perfect localizability since tests are performed at each voxel/sensor/time point separately. However, they lack statistical power due to the distributed nature of neural representations \citep{Haxby2001} and suffer from the multiple comparisons problem. Multivariate approaches  offer high predictive power by combining  sources of information, but they often lack the ability to identify discriminative features.}
+Classical univariate approaches such as t-tests offer perfect localizability since tests are performed at each voxel/sensor/time point separately. However, they lack statistical power due to the distributed nature of neural representations \citep{Haxby2001} and suffer from the multiple comparisons problem. Multivariate approaches  offer high predictive power by combining  sources of information, but they often lack the ability to identify discriminative features.
 
-\red{Searchlight analysis intends to marry localizability with predictive power. It is a well-established technique in the fMRI literature, where a searchlight is defined as a ball of e.g. 1 cm radius, centered on a voxel in the brain \citep{Kriegeskorte2006Information-basedMapping}. All voxels within the radius serve as features for a classification or regression analysis. The result of the analysis is assigned to the central voxel. If the analysis is repeated for all voxel positions, a 3D map of e.g. classification accuracies results that can be overlayed on a brain image. Brain regions that have discriminative power then correspond to peaks in the map. The same idea can be applied to other dimensions such as time points and  frequencies.}
+Searchlight analysis intends to marry localizability with predictive power. It is a well-established technique in the fMRI literature, where a searchlight is defined as a sphere of e.g. 1 cm radius, centered on a voxel in the brain \citep{Kriegeskorte2006Information-basedMapping}. All voxels within the radius serve as features for a classification or regression analysis. The result of the analysis is assigned to the central voxel. If the analysis is repeated for all voxel positions, a 3D map of e.g. classification accuracies results that can be overlayed on a brain image. Brain regions that have discriminative power then correspond to peaks in the map. The same idea can be applied to other dimensions such as time points and  frequencies.
 
-\red{In MVPA-Light, \ttt{mv\_classify\_across\_time} performs a searchlight across the time axis. More bespoke searchlight analyses can be conducted using \ttt{mv\_classify} and \ttt{mv\_regress} by setting the parameter \ttt{cfg.neighbours}.}
+In MVPA-Light, \ttt{mv\_classify\_across\_time} performs a searchlight across the time axis. More bespoke searchlight analyses can be conducted using \ttt{mv\_classify} and \ttt{mv\_regress} by setting the parameter \ttt{cfg.neighbours}.
 
 %%% -----------------------------
 %%% -------- CLASSIFIERS --------
 %%% -----------------------------
 \subsection{Classifiers}\label{sec:classifiers}
 
-\red{\prettyref{fig:classifiers} provides a pictorial description of the classifiers. They are implemented using pairs of train/test functions. In the high-level interface, a classifier and its hyperparameters can be specified using \ttt{cfg.model} and \ttt{cfg.hyperparameter}. For instance, }
+\prettyref{fig:classifiers} provides a pictorial description of the classifiers. They are implemented using pairs of train/test functions. In the high-level interface, a classifier and its hyperparameters can be specified using \ttt{cfg.model} and \ttt{cfg.hyperparameter}. For instance, 
 
 \begin{verbatim}
 cfg.model = 'lda';
 cfg.hyperparameter.lambda = 0.1;
 \end{verbatim}
 
-\red{specifies an LDA classifier and sets the hyperparameter $\lambda = 0.1$. The \ttt{cfg} struct can then be used in a high-level function call, e.g. \ttt{acc = mv\_classify(cfg, X, clabel)}.
-Alternatively, as a low-level interface, the train/test functions can be called directly. For instance, an LDA classifier can be trained directly using}
+specifies an LDA classifier and sets the hyperparameter $\lambda = 0.1$. The \ttt{cfg} struct can then be used in a high-level function call, e.g. \ttt{acc = mv\_classify(cfg, X, clabel)}.
+Alternatively, as a low-level interface, the train/test functions can be called directly. For instance, an LDA classifier can be trained directly using
 
 \begin{verbatim}
 model = train_lda(param, X, clabel)
@@ -271,92 +272,92 @@ The output \ttt{model} is a struct that contains the classifier's parameters aft
 
 The first output argument \ttt{clabel} is the \textit{predicted} class labels. They can be compared against the true class labels to calculate a classification performance metric. \ttt{test\_lda} provides two additional outputs, but not all classifiers have this capability. \ttt{dval} is the \textit{decision value}, a dimensionless quantity that measures the \textit{distance to the hyperplane}. \ttt{prob} contains the probability for a given sample to belong to class 1. 
 
-\red{To introduce some mathematical notation needed in the following, data is denoted as a matrix $\X\in\R^{n \times p}$ of $n$ samples and $p$ predictors/features. The i-th row of $\X$ is denoted as the column vector $\x_i\in\R^p$. Class labels are stored in a vector $\mathbf{y}\in\R^n$ with $y_i$ referring to the i-th class label. When the index is not relevant, the feature vector and class label are simply referred to as $\x$ and $y$. Before delving into the description of the classifiers, two conceptual perspectives are introduced that highlight some of the similarities and differences between the models.}
+To introduce some mathematical notation needed in the following, data is denoted as a matrix $\X\in\R^{n \times p}$ of $n$ samples and $p$ predictors/features. The i-th row of $\X$ is denoted as the column vector $\x_i\in\R^p$. Class labels are stored in a vector $\mathbf{y}\in\R^n$ with $y_i$ referring to the i-th class label. When the index is not relevant, the feature vector and class label are simply referred to as $\x$ and $y$. Before delving into the description of the classifiers, two conceptual perspectives are introduced that highlight some of the similarities and differences between the models.
 
-\subsubsection{\red{Perspective 1: Linear classifiers}}
+\subsubsection{Perspective 1: Linear classifiers}
 
-\red{For two classes, linear classifiers such as LDA, Logistic Regression, and linear SVM act on the data in a unified way. The decision value for a test sample $\x$ is given by }
+For two classes, linear classifiers such as LDA, Logistic Regression, and linear SVM act on the data in a unified way. The decision value for a test sample $\x$ is given by 
 
 \begin{equation}
 \label{eq:linear_dval}
 \text{dval} = \w^\top\x + b
 \end{equation}
 
-\red{where $\w$ is the weight vector or normal to the hyperplane specifying the linear combination of features, and $b$ is the threshold/bias term.  A sample is then  assigned to the first class if \ttt{dval}$>0$ and to the second class if \ttt{dval}$<0$. If we encode class 1 as +1 and class 2 as -1, this can be expressed succinctly as }
+where $\w$ is the weight vector or normal to the hyperplane specifying the linear combination of features, and $b$ is the threshold/bias term.  A sample is then  assigned to the first class if \ttt{dval}$>0$ and to the second class if \ttt{dval}$<0$. If we encode class 1 as +1 and class 2 as -1, this can be expressed succinctly as 
 
 \begin{equation*}
 \text{predicted clabel} =\text{sign} \left(\w^\top\x + b\,\right)
 \end{equation*}
 
-\red{where $\text{sign}:\R\rightarrow\{-1,+1\}$ is the sign function. Linear classifiers differ only in the way that $\w$ and $b$ are derived. }
+where $\text{sign}:\R\rightarrow\{-1,+1\}$ is the sign function. Linear classifiers differ only in the way that $\w$ and $b$ are derived. 
 
-\subsubsection{\red{Perspective 2:  probabilistic classifiers}}
+\subsubsection{Perspective 2:  probabilistic classifiers}
 
-\red{Another useful perspective for elucidating the relationship between  classifiers is given by the Bayesian framework \citep{Bishop2007}. Probabilistic classifiers such as LDA, Naive Bayes, and Logistic Regression are able to directly model class probabilities for individual samples. Let us denote the (posterior) probability that a test sample $\x$ belongs to class $i$ as $P(y = i\,|\,\x)$. One possible approach for calculating this quantity is Bayes' theorem:}
+Another useful perspective for elucidating the relationship between  classifiers is given by the Bayesian framework \citep{Bishop2007}. Probabilistic classifiers such as LDA, Naive Bayes, and Logistic Regression are able to directly model class probabilities for individual samples. Let us denote the (posterior) probability that a test sample $\x$ belongs to class $i$ as $P(y = i\,|\,\x)$. One possible approach for calculating this quantity is Bayes' theorem:
 
 \begin{equation}
 \label{eq:bayes}
 P(y = i\,|\,\x) = \frac{P(\x\,|\,y = i)\  P(y = i)}{P(\x)}
 \end{equation}
 
-\red{Here, $P(\x\,|\,y = i)$ is the likelihood function which quantifies the relative probability of observing  and $P(y = i)$ is the prior probability for a sample to belong to class $i$. The denominator, called evidence, can be calculated by marginalizing across the classes: $P(\x) = \sum_i P(\x\,|\,y = i)\  P(y = i)$.} 
+Here, $P(\x\,|\,y = i)$ is the likelihood function which quantifies the relative probability of observing $\x$ given the class label, and $P(y = i)$ is the prior probability for a sample to belong to class $i$. The denominator, called evidence, can be calculated by marginalizing across the classes: $P(\x) = \sum_i P(\x\,|\,y = i)\  P(y = i)$.
 
 %%% -------- LDA --------
 \subsubsection{Linear Discriminant Analysis (LDA)}\label{sec:lda}
 
-\red{If the classes follow a multivariate Gaussian distribution with a common covariance matrix for all classes, LDA yields the theoretically optimal classifier \citep{Duda1998}. In the context of EEG/MEG analysis, LDA is discussed in detail in \cite{Blankertz2011}. The likelihood function takes the form}
+If the classes follow a multivariate Gaussian distribution with a common covariance matrix for all classes, LDA yields the theoretically optimal classifier \citep{Duda1998}. In the context of EEG/MEG analysis, LDA is discussed in detail in \cite{Blankertz2011}. The likelihood function takes the form
 
 \begin{equation}
 \label{eq:lda_likelihood}
 P(\x\,|\,y = i) \sim \mathcal{N}(\m_i, \mathbf{\Sigma})
 \end{equation}
 
-\red{with a class-specific mean $\m_i$ and common covariance matrix $\mathbf{\Sigma}$ which have to be  estimated from the training data. \prettyref{eq:bayes} can be evaluated directly to calculate class probabilities. A prediction can be done by selecting the most likely class out of all candidate classes, }
+with a class-specific mean $\m_i$ and common covariance matrix $\mathbf{\Sigma}$ which have to be  estimated from the training data. \prettyref{eq:bayes} can be evaluated directly to calculate class probabilities. A prediction can be done by selecting the most likely class out of all candidate classes, 
 
 \begin{equation*}
 \text{predicted class} = \underset{i}{\text{arg max}}\ P(y = i\,|\,\x)
 \end{equation*}
 
-\red{which is known as the maximum a posteriori (MAP) rule. LDA is closely related to other statistical models. For two classes, LDA is equivalent to linear regression using the class labels as targets. It is also equivalent to LCMV beamforming when applied to ERP data \citep{Treder2016}. The latter equivalence relationship also applies to other methods based on generalized eigenvalue decomposition of covariance matrices \citep{DeCheveigne2014JointAnalysis}.}
+which is known as the maximum a posteriori (MAP) rule. LDA is closely related to other statistical models. For two classes, LDA is equivalent to linear regression using the class labels as targets. It is also equivalent to LCMV beamforming when applied to ERP data \citep{Treder2016}. The latter equivalence relationship also applies to other methods based on generalized eigenvalue decomposition of covariance matrices \citep{DeCheveigne2014JointAnalysis}.
 
-\red{In MVPA-Light, multi-class LDA is implemented as the classifier  \texttt{'multiclass\_lda'}. For two classes, a more efficient implementation is available denoted as  \ttt{'lda'}. In practice, the covariance matrix is often ill-conditioned and needs to be regularized \citep{Blankertz2011}. The hyperparameter \ttt{lambda} controls the amount of regularization. In shrinkage regularization,  \ttt{lambda} $\in [0,1]$ blends between the empirical covariance matrix (\ttt{lambda}=0) and a scaled identity matrix (\ttt{lambda}=1). By default, \ttt{lambda} is estimated automatically using the Ledoit-Wolf formula \citep{Ledoit2003HoneyMatrix,Blankertz2011}. \prettyref{sec:lda_implementation} of the appendix discusses the implementation of LDA in detail.} 
+In MVPA-Light, multi-class LDA is implemented as the classifier  \texttt{'multiclass\_lda'}. For two classes, a more efficient implementation is available denoted as  \ttt{'lda'}. In practice, the covariance matrix is often ill-conditioned and needs to be regularized \citep{Blankertz2011}. The hyperparameter \ttt{lambda} controls the amount of regularization. In shrinkage regularization,  \ttt{lambda} $\in [0,1]$ blends between the empirical covariance matrix (\ttt{lambda}=0) and a scaled identity matrix (\ttt{lambda}=1). By default, \ttt{lambda} is estimated automatically using the Ledoit-Wolf formula \citep{Ledoit2003HoneyMatrix,Blankertz2011}. \prettyref{sec:lda_implementation} of the appendix discusses the implementation of LDA in detail.
 
 
 %%% -------- NAIVE BAYES --------
 \subsubsection{Naive Bayes}
 
-\red{In Naive Bayes, the features are assumed to be conditionally independent of each other given the class label \citep{Bishop2007}. While this is indeed naive and often wrong, Naive Bayes has nevertheless been remarkably successful in classification problems. The independence assumption leads to a straightforward formula for the likelihood function since only univariate densities need to be estimated. Let $\xf{j}$ be the $j$-th feature and $\x = [\xf{1}, \xf{2}, ..., \xf{p}]^\top$ be a feature vector then the likelihood function is given by }
+In Naive Bayes, the features are assumed to be conditionally independent of each other given the class label \citep{Bishop2007}. While this is indeed naive and often wrong, Naive Bayes has nevertheless been remarkably successful in classification problems. The independence assumption leads to a straightforward formula for the likelihood function since only univariate densities need to be estimated. Let $\xf{j}$ be the $j$-th feature and $\x = [\xf{1}, \xf{2}, ..., \xf{p}]^\top$ be a feature vector then the likelihood function is given by 
 
 \begin{equation*}
-P(\x\,|\,y = i) = \prod_{j=1}^p P(\xf{j}\,|\,y = i)\, P(y = i)
+P(\x\,|\,y = i) = \prod_{j=1}^p P(\xf{j}\,|\,y = i)
 \end{equation*}
 
-\red{Like in LDA, the predicted class can be obtained using the MAP rule. In MVPA-Light, Naive Bayes is implemented as \texttt{'naive\_bayes'}. Additionally, MVPA-Light assumes that these densities are univariate Gaussian, i.e. $P(\xf{j}\,|\,y = i) \sim \mathcal{N}(m_{ij}, \sigma^2_{ij})$. For Gaussian densities, the independence assumption is equivalent to assuming that the covariance matrix is diagonal. As indicated in \prettyref{fig:classifiers}, there is a close relationship between LDA and Gaussian Naive Bayes: LDA allows for a dense covariance matrix, but it requires that it is the same for all classes. In contrast, Naive Bayes allows each class to have a different covariance matrix, but it requires each matrix to be diagonal. Additional details on the implementation are given in \prettyref{sec:naive_bayes_implementation}.} 
+Like in LDA, the predicted class can be obtained using the MAP rule. In MVPA-Light, Naive Bayes is implemented as \texttt{'naive\_bayes'}. Additionally, MVPA-Light assumes that these densities are univariate Gaussian, i.e. $P(\xf{j}\,|\,y = i) \sim \mathcal{N}(m_{ij}, \sigma^2_{ij})$. For Gaussian densities, the independence assumption is equivalent to assuming that the covariance matrix is diagonal. As indicated in \prettyref{fig:classifiers}, there is a close relationship between LDA and Gaussian Naive Bayes: LDA allows for a dense covariance matrix, but it requires that it is the same for all classes. In contrast, Naive Bayes allows each class to have a different covariance matrix, but it requires each matrix to be diagonal. Additional details on the implementation are given in \prettyref{sec:naive_bayes_implementation}.
 
 %%% -------- LOGISTIC REGRESSION --------
 \subsubsection{Logistic Regression}
 
-\red{In Logistic Regression for two classes, the posterior probability is modeled directly by fitting a logistic function to the data \citep{Hastie2009}. If the two classes are coded as +1 and -1, it is given by}
+In Logistic Regression for two classes, the posterior probability is modeled directly by fitting a logistic function to the data \citep{Hastie2009}. If the two classes are coded as +1 and -1, it is given by
 
 \begin{equation}
 \label{eq:logreg_probability}
 P(y = \pm 1\,|\,\x) = \frac{1}{1 + \text{exp}(-y\,(\w^\top\x + b))}
 \end{equation}
 
-\red{The weights $\w$ are found by minimizing the logistic loss function}
+The weights $\w$ are found by minimizing the logistic loss function
 
 \begin{equation}
 \label{eq:logreg_loss_function}
 \L_\text{LR}(\w) = \sum_{i=1}^n \log(1 + e^{-y_i(\w^\top\x_i + b)})
 \end{equation}
 
-\red{In MVPA-Light, Logistic Regression  is implemented as \texttt{'logreg'}. By default, log-F(1,1) regularization (\ttt{reg = 'logf'}) is used by imposing Jeffrey's prior on the weights \citep{Firth1993BiasEstimates,Rahman2017PerformanceData.,King2001}. Alternatively, L2-regularization can be used to impose a Gaussian prior on the weights (\ttt{reg = 'l2'}). In this case, an additional hyperparameter \ttt{lambda} $\in [0,\infty)$ that controls the amount of regularization needs to be specified by the user. It can be set to a fixed value by the user. Alternatively, a range of candidates can be specified (e.g. \ttt{lambda = [0.001, 0.01, 0.1, 1]}). A nested cross-validation is then performed to select the optimal value. Additional details on the implementation are given in \prettyref{sec:logreg_implementation}. An alternative implementation using LIBLINEAR is also available, see \prettyref{sec:libsvm}.}
+In MVPA-Light, Logistic Regression  is implemented as \texttt{'logreg'}. By default, log-F(1,1) regularization (\ttt{reg = 'logf'}) is used by imposing Jeffrey's prior on the weights \citep{Firth1993BiasEstimates,Rahman2017PerformanceData.,King2001}. Alternatively, L2-regularization can be used to impose a Gaussian prior on the weights (\ttt{reg = 'l2'}). In this case, an additional hyperparameter \ttt{lambda} $\in [0,\infty)$ that controls the amount of regularization needs to be specified by the user. It can be set to a fixed value by the user. Alternatively, a range of candidates can be specified (e.g. \ttt{lambda = [0.001, 0.01, 0.1, 1]}). A nested cross-validation is then performed to select the optimal value. Additional details on the implementation are given in \prettyref{sec:logreg_implementation}. An alternative implementation using LIBLINEAR is also available, see \prettyref{sec:libsvm}.
 
 %%% -------- SVM --------
 \subsubsection{Linear Support Vector Machine (SVM)}
 
-\red{A SVM has no underlying probabilistic model. Instead, it is based on the idea of maximizing the margin \citep{Scholkopf2001LearningBeyond,Hearst1998SupportMachines}. For linearly separable data, the margin is the distance from the hyperplane to the closest data point (dotted line in \prettyref{fig:classifiers}). This distance is given by $1/||\w||$. Minimizing $||\w||$ is then equal to maximizing the margin. At the same time, one needs to make sure that the training samples are correctly classified at a distance from the hyperplane. This can be achieved by requiring 
-$\w^\top\x_i + b\ge 1$ for class 1 and $\w^\top\x_i + b\le -1$ for class 2. Encoding the classes as +1 and -1, both terms can be combined into $y_i\, (\w^\top\x_i + b) \ge 1$. Unfortunately, this constraint cannot be satisfied for every training sample $i\in\{1,...,n\}$ if the data cannot be perfectly separated. To this end, positive slack variables $\xi_i$ are introduced that allow for misclassifications. Now the goal becomes to maximize the margin while simultaneously minimizing the amount of misclassifications given by $\sum_i \xi_i$. Put together, this leads to the following optimization problem: }
+A SVM has no underlying probabilistic model. Instead, it is based on the idea of maximizing the margin \citep{Scholkopf2001LearningBeyond,Hearst1998SupportMachines}. For linearly separable data, the margin is the distance from the hyperplane to the closest data point (dotted line in \prettyref{fig:classifiers}). This distance is given by $1/||\w||$. Minimizing $||\w||$ is then equal to maximizing the margin. At the same time, one needs to make sure that the training samples are correctly classified at a distance from the hyperplane. This can be achieved by requiring 
+$\w^\top\x_i + b\ge 1$ for class 1 and $\w^\top\x_i + b\le -1$ for class 2. Encoding the classes as +1 and -1, both terms can be combined into $y_i\, (\w^\top\x_i + b) \ge 1$. Unfortunately, this constraint cannot be satisfied for every training sample $i\in\{1,...,n\}$ if the data cannot be perfectly separated. To this end, positive slack variables $\xi_i$ are introduced that allow for misclassifications. Now the goal becomes to maximize the margin while simultaneously minimizing the amount of misclassifications given by $\sum_i \xi_i$. Put together, this leads to the following optimization problem: 
 
 \begin{align}
 \begin{split}
@@ -367,21 +368,21 @@ $\w^\top\x_i + b\ge 1$ for class 1 and $\w^\top\x_i + b\le -1$ for class 2. Enco
 \end{split}
 \end{align}
 
-\red{The resultant classifier, called two-class L1-Support Vector Machine (SVM) is implemented as \ttt{'svm'}. The hyperparameter \ttt{c} controls the amount of regularization and needs to be set by the user. Despite the lack of a probabilistic model, a Platt approximation using an external function (\ttt{http://www.work.caltech.edu/~htlin/program/libsvm/}) can be used to estimate class probabilities if required. Additional details on the implementation are given in \prettyref{sec:svm_implementation}. Alternative implementations using LIBSVM and LIBLINEAR are also available, see \prettyref{sec:libsvm}.}
+The resultant classifier, called two-class L1-Support Vector Machine (SVM) is implemented as \ttt{'svm'}. The hyperparameter \ttt{c} controls the amount of regularization and needs to be set by the user. Despite the lack of a probabilistic model, a Platt approximation using an external function (\ttt{http://www.work.caltech.edu/~htlin/program/libsvm/}) can be used to estimate class probabilities if required. Additional details on the implementation are given in \prettyref{sec:svm_implementation}. Alternative implementations using LIBSVM and LIBLINEAR are also available, see \prettyref{sec:libsvm}.
 
 %%% -------- KERNEL METHODS --------
 \subsubsection{Kernel classifiers}\label{sec:kernel-methods}
 
-\red{In kernel methods such as SVM and kernel FDA, a sample is implicitly mapped from the input space $\mathcal{X}$ into a high-dimensional feature space $\mathcal{F}$ using a map $\phi:\mathcal{X}\rightarrow\mathcal{F}$. As illustrated in \prettyref{fig:classifiers}, such a map can translate a non-linear classification problem into linear problem in feature space \citep{Scholkopf2001LearningBeyond}. For two classes, decision values are given by }
+In kernel methods such as SVM and kernel FDA, a sample is implicitly mapped from the input space $\mathcal{X}$ into a high-dimensional feature space $\mathcal{F}$ using a map $\phi:\mathcal{X}\rightarrow\mathcal{F}$. As illustrated in \prettyref{fig:classifiers}, such a map can translate a non-linear classification problem into linear problem in feature space \citep{Scholkopf2001LearningBeyond}. For two classes, decision values are given by 
 
 \begin{equation}
 \label{eq:kernel_dval}
 \text{dval} = \w^\top\phi(\x) + b
 \end{equation}
 
-\red{If we compare this formula to \prettyref{eq:linear_dval}, it becomes evident that kernel classifiers are linear classifiers acting on non-linear transformations of the features. Often, it is  infeasible to explicitly apply the map due to the high dimensionality of $\mathcal{F}$.  However, for methods such as SVM and LDA, a very efficient workaround is available. They can be rewritten into a form wherein only the inner products between pairs of samples are needed, i.e. $\phi(\x)\cdot\phi(\x')$ for samples $\x$ and $\x'$. Now, if $\phi$ maps to a Reproducing Kernel Hilbert Space (RKHS), these inner products can be efficiently calculated via a kernel function $k$ that operates in input space, resulting in the identity $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. This is known as the \textit{kernel trick}.}
+If we compare this formula to \prettyref{eq:linear_dval}, it becomes evident that kernel classifiers are linear classifiers acting on non-linear transformations of the features. Often, it is  infeasible to explicitly apply the map due to the high dimensionality of $\mathcal{F}$.  However, for methods such as SVM and LDA, a very efficient workaround is available. They can be rewritten into a form wherein only the inner products between pairs of samples are needed, i.e. $\phi(\x)\cdot\phi(\x')$ for samples $\x$ and $\x'$. Now, if $\phi$ maps to a Reproducing Kernel Hilbert Space (RKHS), these inner products can be efficiently calculated via a kernel function $k$ that operates in input space, resulting in the identity $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. This is known as the \textit{kernel trick}.
 
-\red{To give a simple example, consider two samples with  two-dimensional features, $\x = [x_1, x_2]$ and $\x' = [x_1', x_2']$. The homogeneous polynomial kernel of degree 2 has the kernel function $k(\x,\x') = (\sum_{i=1}^2 \x_i\x_i')^2$ and the corresponding feature map $\phi:\R^2\rightarrow\R^3$ with $\phi(\x)= [x_1^2, \sqrt{2}x_1 x_2, x_2^2]$. It is now easily verified that $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. For LDA, a kernelized version called Kernel Fisher Discriminant Analysis (KFDA) has been developed by \citep{Mika1999FisherKernels}. It is available as \ttt{'kernel\_fda'}. Like in LDA, the model can be regularized using ridge regularization (\ttt{reg = 'ridge'}) or shrinkage regularization (\ttt{reg = 'shrink'}). The regularization hyperparameter \ttt{lambda} needs to be set by the user. For shrinkage, in many cases a small value (e.g. \ttt{lambda = 0.01}) is adequate. For both SVM and KFDA, the kernel can be chosen by setting the \ttt{kernel} parameter. Further information on the kernels is provided in the train functions. }
+To give a simple example, consider two samples with  two-dimensional features, $\x = [x_1, x_2]$ and $\x' = [x_1', x_2']$. The homogeneous polynomial kernel of degree 2 has the kernel function $k(\x,\x') = (\sum_{i=1}^2 \x_i\x_i')^2$ and the corresponding feature map $\phi:\R^2\rightarrow\R^3$ with $\phi(\x)= [x_1^2, \sqrt{2}x_1 x_2, x_2^2]$. It is now easily verified that $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. For LDA, a kernelized version called Kernel Fisher Discriminant Analysis (KFDA) has been developed by \cite{Mika1999FisherKernels}. It is available as \ttt{'kernel\_fda'}. Like in LDA, the model can be regularized using ridge regularization (\ttt{reg = 'ridge'}) or shrinkage regularization (\ttt{reg = 'shrink'}). The regularization hyperparameter \ttt{lambda} needs to be set by the user. For shrinkage, in many cases a small value (e.g. \ttt{lambda = 0.01}) is adequate. For both SVM and KFDA, the kernel can be chosen by setting the \ttt{kernel} parameter. Further information on the kernels is provided in the train functions. 
 
 %%% -------- ENSEMBLES --------
 \subsubsection{Ensemble methods}
@@ -410,7 +411,9 @@ Like classifiers, regression models are implemented using pairs of train/test fu
 %%% -------- RIDGE --------
 \subsubsection{Ridge regression}
 
-Ridge regression is a regularized version of ordinary least-squares (OLS) regression that is useful for analyzing data that suffers from multicollinearity. The model is regularized using a penalty that shrinks the weights towards zero. For a given regularization parameter $\lambda\in[0,\infty)$, the primal and dual ridge solutions are given by
+\todo{add cost function, explain primal/dual}
+
+Ridge regression is a regularized version of ordinary least-squares (OLS) regression that is useful for analyzing data that suffers from multicollinearity. The model is regularized using a penalty that shrinks the weights towards zero. For a given regularization parameter \ttt{lambda}$\in[0,\infty)$, denoted by the Greek symbol $\lambda$, the primal and dual ridge solutions are given by
 
 
 \begin{align}
@@ -421,7 +424,7 @@ Ridge regression is a regularized version of ordinary least-squares (OLS) regres
 \end{split}
 \end{align}
 
-where $\I_p\in\R^{p\times p}$ and $\I_p\in\R^{n\times n}$ are identity matrices. For $\lambda=0$ ridge regression reduces to ordinary least-squares regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger or smaller than $p$.
+where $\I_p\in\R^{p\times p}$ and $\I_n\in\R^{n\times n}$ are identity matrices. For \ttt{lambda}=0 ridge regression reduces to ordinary least-squares regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger or smaller than $p$.
 
 %%% -------- KERNEL RIDGE --------
 \subsubsection{Kernel ridge regression}
@@ -474,7 +477,7 @@ If cross-validation is used then the metric is initially calculated for each tes
 %%% ---------------------------------
 \subsection{Statistical analysis}\label{sec:statistics}
 
-In many neuroimaging experiments, establishing the statistical significance of a classification or regression metric is more important than maximizing the metric per se. \red{Neuroimaging data is typically hierarchical: a study comprises many subjects, and each subject comprises many trials. To perform group analysis, a common approach is then to start with a Level 1 (single-subject) analysis, e.g. calculating the means for each subject in two different experimental conditions. At this stage, the samples consist of single trials for a particular subject. The means are then taken on to Level 2 (group level). At this stage, each subject constitutes one sample  \citep{Mumford2007ModelingData}}. 
+In many neuroimaging experiments, establishing the statistical significance of a classification or regression metric is more important than maximizing the metric per se. Neuroimaging data is typically hierarchical: a study comprises many subjects, and each subject comprises many trials. To perform group analysis, a common approach is then to start with a Level 1 (single-subject) analysis, e.g. calculating the means for each subject in two different experimental conditions. At this stage, the samples consist of single trials for a particular subject. The means are then taken on to Level 2 (group level). At this stage, each subject constitutes one sample  \citep{Mumford2007ModelingData}. 
 The function \ttt{mv\_statistics} implements both Level 1 (single-subject) and Level 2 (group level) statistical analysis. For Level 1 analysis, the following tests are available:
 
 \begin{itemize}
@@ -719,19 +722,19 @@ The benchmarking results should not be interpreted as final verdicts on the resp
 % % Statistics
 % Second-level statistical analyses are not currently covered by the toolbox. Such statistics can be obtained by combining e.g. the cluster permutation statistics framework in FieldTrip \citep{Maris2007} with MVPA-Light. For single subjects, a binomial test for accuracy is implemented in the function \ttt{mv\_statistics}. For the future, it is planned to include a second-level statistical framework based on cluster permutation tests directly in the toolbox. Since permutation tests are computationally expensive, the framework is planned to include recent developments such as a fast permutation scheme for LDA and kernel FDA \citep{Treder2019DirectFDA}.
 
-\subsection{\red{Setting up a MVPA pipeline}}
+\subsection{Setting up a MVPA pipeline}
 
-\red{If one is spoilt for choice, selecting  a model, metrics, and preprocessing steps can be challenging. This section offers practical advice in this regard. Such recommendations tend to be subjective to some extent, hence users are encouraged to perform their own MVPA experiments and compare different models, hyperparameter settings etc. To prevent a statistical bias, extensive experiments should not be performed on the dataset at hand. Instead, a similar dataset e.g. recorded using the same hardware with a similar paradigm can be used for experimentation.\\} 
+If one is spoilt for choice, selecting  a model, metrics, and preprocessing steps can be challenging. This section offers practical advice in this regard. Such recommendations tend to be subjective to some extent, hence users are encouraged to perform their own MVPA experiments and compare different models, hyperparameter settings etc. To prevent a statistical bias, extensive experiments should not be performed on the dataset at hand. Instead, a similar dataset e.g. recorded using the same hardware with a similar paradigm can be used for experimentation.\\
 
-\red{\textit{Preprocessing the data:} Although MVPA can be applied to raw data,  this may negatively affect performance, so data has ideally been cleaned and corrupted trials have been rejected. It is useful to normalize the data for numerical stability by e.g. z-scoring each feature to mean = 0 and standard deviation = 1. This is particularly important for Logistic Regression which uses the exponential function. It also applies to LDA and kernel methods because lack of normalization can lead to results being dominated by the features with the largest scaling.  Normalization can be applied on the whole dataset, unless the goal is to simulate online performance (e.g. in a brain-computer interface). In this case, it should be performed nested inside the  cross-validation by using the \ttt{cfg.preprocess} field. All preprocessing steps involving the class labels, such as CSP \citep{Blankertz2008a}, also need to be performed in a nested fashion. Furthermore, for kernel methods, computation can be speeded up by precomputing the kernel matrix using \ttt{compute\_kernel\_matrix}, although this approach does not work when time generalization is required.}
+\textit{Preprocessing the data:} Although MVPA can be applied to raw data, this may negatively affect performance, so data has ideally been cleaned and corrupted trials have been rejected. It is useful to normalize the data for numerical stability by e.g. z-scoring each feature to mean = 0 and standard deviation = 1. This is particularly important for Logistic Regression which uses the exponential function. It also applies to LDA and kernel methods because lack of normalization can lead to results being dominated by the features with the largest scaling.  Normalization can be applied on the whole dataset, unless the goal is to simulate online performance (e.g. in a brain-computer interface). In this case, it should be performed nested inside the  cross-validation by using the \ttt{cfg.preprocess} field. All preprocessing steps involving the class labels, such as CSP \citep{Blankertz2008a}, also need to be performed in a nested fashion. Furthermore, for kernel methods, computation can be speeded up by precomputing the kernel matrix using \ttt{compute\_kernel\_matrix}, although this approach does not work when time generalization is required.
 
-\red{\textit{Choosing a classifier:} Linear classifiers perform well in a large variety of tasks. LDA is a good default model, since it is computationally efficient and robust thanks to regularization \citep{Blankertz2011}. Logistic Regression and linear SVM are more resilient to outliers than LDA, so may be preferred for noisy or strongly non-Gaussian data. Logistic Regression has a hyperparameter-free regularization by default, hence it is more user-friendly than SVM which requires setting the hyperparameter $c$. Naive Bayes should only be used after the features have been  decorrelated using PCA or ICA. For non-linear problems, kernel FDA or SVM can be used. Again, SVM requires $c$ to be set, whereas for kernel FDA the default regularization often works well. Regarding the choice of a kernel, the RBF kernel is adequate for most classification tasks, but its hyperparameter \ttt{gamma} determining the kernel width might require tuning. If maximizing classification accuracy is vital, it is worth to try an ensemble of classifiers. }
+\textit{Choosing a classifier:} Linear classifiers perform well in a large variety of tasks. LDA is a good default model, since it is computationally efficient and robust thanks to regularization \citep{Blankertz2011}. Logistic Regression and linear SVM are more resilient to outliers than LDA, so may be preferred for noisy or strongly non-Gaussian data. Logistic Regression has a hyperparameter-free regularization by default, hence it is more user-friendly than SVM which requires setting the hyperparameter $c$. Naive Bayes should only be used after the features have been  decorrelated using PCA or ICA. For non-linear problems, kernel FDA or SVM can be used. Again, SVM requires $c$ to be set, whereas for kernel FDA the default regularization often works well. Regarding the choice of a kernel, the RBF kernel is adequate for most classification tasks, but its hyperparameter \ttt{gamma} determining the kernel width might require tuning. If maximizing classification accuracy is vital, it is worth to try an ensemble of classifiers. 
 
-\red{\textit{Choosing a regression model:} Ridge regression tends to perform well on a variety of tasks. If the data is noisy, linear Support Vector Regression (SVR) using LIBLINEAR can be applied. If the problem is clearly non-linear, either kernel ridge or kernel SVR using LIBSVM using a RBF kernel is recommended. }
+\textit{Choosing a regression model:} Ridge regression tends to perform well on a variety of tasks. If the data is noisy, linear Support Vector Regression (SVR) using LIBLINEAR can be applied. If the problem is clearly non-linear, either kernel ridge or kernel SVR using LIBSVM using a RBF kernel is recommended. 
 
-\red{\textit{Metrics:} The most common classification metric is accuracy. For multi-class problems, it is useful to complement it with a confusion matrix. For two classes, AUC is a good alternative to accuracy since it is more robust to class imbalances and invariant to shifts of the classifier threshold. When the roles of the  classes are asymmetric (e.g. patients vs controls), it is useful to report precision and recall along with their harmonic mean (F1 score). If in doubt, report multiple metrics.}
+\textit{Metrics:} The most common classification metric is accuracy. For multi-class problems, it is useful to complement it with a confusion matrix. For two classes, AUC is a good alternative to accuracy since it is more robust to class imbalances and invariant to shifts of the classifier threshold. When the roles of the  classes are asymmetric (e.g. patients vs controls), it is useful to report precision and recall along with their harmonic mean (F1 score). If in doubt, report multiple metrics.
 
-\red{\textit{Cross-validation:} Classification and regression results should be cross-validated in order to control for overfitting. Cross-validation is performed by default in all high-level functions. Unless the number of samples is very small, leave-one-out cross-validation should be avoided because it suffers from a large bias; instead, 5-fold or 10-fold cross-validation should be used by setting \ttt{cfg.k = 5} or \ttt{cfg.k = 10} \citep{James2013}. Since the folds are randomly assigned, repeating the cross-validation is recommended to get a more stable estimate. This can be done by e.g. setting \ttt{cfg.repeat = 2}.}
+\textit{Cross-validation:} Classification and regression results should be cross-validated in order to control for overfitting. Cross-validation is performed by default in all high-level functions. Unless the number of samples is very small, leave-one-out cross-validation should be avoided because it suffers from a large bias; instead, 5-fold or 10-fold cross-validation should be used \citep{James2013}. Since the folds are randomly assigned, repeating the cross-validation is recommended to get a more stable estimate.
 
 \subsection{Conclusion}
 
@@ -750,7 +753,7 @@ MVPA-Light is a comprehensive toolbox for multivariate pattern analysis. Its mod
 %%% -------- LDA --------
 \subsection{LDA implementation}\label{sec:lda_implementation}
 
-\red{The implementation of LDA in MVPA-Light differs from the generative model presented in \prettyref{sec:lda}. It uses the more efficient Fisher Discriminant Analysis (FDA)  \citep{Fisher1936} which omits calculating probabilities and operates in two steps.} In the first step, the data is mapped onto a $(c-1)$-dimensional subspace, where $c$ is the number of classes. In the second step, a sample is assigned to the class with the closest class centroid. LDA thus acts as a prototype classifier within this subspace. The coordinates for the mapping are found by iteratively solving the equation
+The implementation of LDA in MVPA-Light differs from the generative model presented in \prettyref{sec:lda}. It uses the more efficient Fisher Discriminant Analysis (FDA)  \citep{Fisher1936} which omits calculating probabilities and operates in two steps. In the first step, the data is mapped onto a $(c-1)$-dimensional subspace, where $c$ is the number of classes. In the second step, a sample is assigned to the class with the closest class centroid. LDA thus acts as a prototype classifier within this subspace. The coordinates for the mapping are found by iteratively solving the equation
 
 \begin{equation}
 \label{eq:fda}
@@ -767,7 +770,7 @@ where $\S_b$ and $\S_w$ are defined as
 \end{alignedat}
 \end{equation*}
 
-Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class mean, $\mbar$ is the sample mean, and $\mathcal{C}_j$ is the set of indices of instances in class $j$. \red{Note that $\S_w$ is simply the un-normalized version of $\mathbf{\Sigma}$ in  \prettyref{eq:lda_likelihood}}. For two classes, LDA has the simple solution 
+Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class mean, $\mbar$ is the sample mean, and $\mathcal{C}_j$ is the set of indices of instances in class $j$. Note that $\S_w$ is simply the un-normalized version of $\mathbf{\Sigma}$ in  \prettyref{eq:lda_likelihood}. For two classes, LDA has the simple solution 
 
 \begin{equation}
 \label{eq:lda_solution}
@@ -782,7 +785,7 @@ The threshold is calculated under the assumption of equal probabilities for the 
 \widetilde{\S}_w = (1-\lambda)\ \S_w + \lambda\,\nu\,\I
 \end{align}
 
-where $\I$ is the identity matrix and $\nu = \text{trace}(\S_w)/p$ \citep{Blankertz2011}. For $\lambda=1$, LDA becomes a prototype classifier, that is, each sample is assigned to the closest centroid in feature space. \red{The effect of shrinkage regularization is depicted in \prettyref{fig:lda}}. In the literature, LDA has also been used with ridge-regression type regularization, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularization by setting \ttt{reg = 'ridge'}. However, both regularization approaches are equivalent up to scaling. For a given shrinkage value $\lambda<1$, the corresponding ridge regularization value is $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$.
+where $\I$ is the identity matrix and $\nu = \text{trace}(\S_w)/p$ \citep{Blankertz2011}. For $\lambda=1$, LDA becomes a prototype classifier, that is, each sample is assigned to the closest centroid in feature space. The effect of shrinkage regularization is depicted in \prettyref{fig:lda}. In the literature, LDA has also been used with ridge-regression type regularization, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularization by setting \ttt{reg = 'ridge'}. However, both regularization approaches are equivalent up to scaling. For a given shrinkage value $\lambda<1$, the corresponding ridge regularization value is $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$.
 
 If $p \gg n$, that is, the number of features is much larger than the number of samples, calculation and inversion of the [features $\times$ features] covariance matrix can be computationally expensive. In these cases, the [samples $\times$ samples] Gram matrix can be used instead. The hyperparameter \ttt{form} decides on whether the 'primal' form based on covariance or 'dual' form based on the Gram matrix is used. By default (\ttt{form = 'auto'}), this is decided automatically by comparing $n$ and  $p$. The resultant formula is equivalent to kernel FDA with a linear kernel. However, the regularization of $\mathbf{N}$ in  kernel FDA is \textit{not} equivalent to the regularization of $\S_w$. Furthermore, to the best of our knowledge, the Ledoit-Wolf estimate has not been reported in the literature using dual notation. Therefore, a dual regularization approach for LDA is developed next.
 
@@ -852,20 +855,20 @@ P(y = i\,|\,\x) = \frac{e^{d_i}}{\sum_{k=1}^c e^{d_k}}.
 %%% -------- LOGISTIC REGRESSION --------
 \subsection{Logistic Regression implementation}\label{sec:logreg_implementation}
 
-\red{The optimization problem underlying Logistic Regression is convex but there exists no analytical solution}. Instead, an iterative algorithm is required to optimize $\w$. In MVPA-Light, the Trust Region Newton Method introduced by \cite{Lin2007TrustRegression} is implemented in the function \ttt{TrustRegionDoglegGN}. \red{Log-F(1,1) regularization (\ttt{reg = 'logf'}) is implemented via data augmentation. L2-regularization is implemented by adding a penalty term to the loss function:}
+The optimization problem underlying Logistic Regression is convex but there exists no analytical solution. Instead, an iterative algorithm is required to optimize $\w$. In MVPA-Light, the Trust Region Newton Method introduced by \cite{Lin2007TrustRegression} is implemented in the function \ttt{TrustRegionDoglegGN}. Log-F(1,1) regularization (\ttt{reg = 'logf'}) is implemented via data augmentation. L2-regularization is implemented by adding a penalty term to the loss function:
 
 \begin{equation}
 \label{eq:logreg_loss_function_plus_penalty}
 \L_\text{LR}^{L2}(\w) = \L_\text{LR}(\w) + \frac{\lambda}{2}\, ||\w||^2
 \end{equation}
 
-Here, $\lambda\in [0,\infty)$ controls the amount of regularization. While log-F(1,1) regularization does not require any hyperparameters, L2-regularization requires $\lambda$ to be set. \red{The effect of regularization on the predicted probabilities is depicted in \prettyref{fig:logreg}. If multiple candidates are provided for $\lambda$, a line search is performed using nested cross-validation. This kind of line search is costly, since the classifier has to be trained multiple times for each value of the hyperparameter. To speed up the search, 'warm starts' can be used wherein the initial value for $\w$, denoted as  $\w_\text{init}$, is a function of the solutions in previous iterations.} If \ttt{predict\_regularization\_path=1}, then in the $k$-th iteration, a polynomial function is fit to the solutions $\w_{k-1},\w_{k-2},...$ to the previous iterations  using $\lambda_{k-1}, \lambda_{k-2}, ...$ as predictors. It is then evaluated at the current value of $\lambda$ in order to predict a good starting vector for the optimization.
+Here, $\lambda\in [0,\infty)$ controls the amount of regularization. While log-F(1,1) regularization does not require any hyperparameters, L2-regularization requires $\lambda$ to be set. The effect of regularization on the predicted probabilities is depicted in \prettyref{fig:logreg}. If multiple candidates are provided for $\lambda$, a line search is performed using nested cross-validation. This kind of line search is costly, since the classifier has to be trained multiple times for each value of the hyperparameter. To speed up the search, 'warm starts' can be used wherein the initial value for $\w$, denoted as  $\w_\text{init}$, is a function of the solutions in previous iterations. If \ttt{predict\_regularization\_path=1}, then in the $k$-th iteration, a polynomial function is fit to the solutions $\w_{k-1},\w_{k-2},...$ to the previous iterations  using $\lambda_{k-1}, \lambda_{k-2}, ...$ as predictors. It is then evaluated at the current value of $\lambda$ in order to predict a good starting vector for the optimization.
 
 
 %%% -------- SVM --------
 \subsection{SVM implementation}\label{sec:svm_implementation}
 
-\red{The formulation of SVM in \prettyref{eq:svm_primal} is intuitive but limited to the linear case. It can be rewritten into a dual formulation which applies to both linear and kernel case  \citep{Hsieh2008ASVM}. The optimal weights are then found by solving the quadratic optimization problem }
+The formulation of SVM in \prettyref{eq:svm_primal} is intuitive but limited to the linear case. It can be rewritten into a dual formulation which applies to both linear and kernel case  \citep{Hsieh2008ASVM}. The optimal weights are then found by solving the quadratic optimization problem 
 
 \begin{align}
 \begin{split}
@@ -990,7 +993,7 @@ The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{overview_classifiers}
-\caption{\red{Overview of the available classifiers. Dots represent samples, color indicates the class. \textit{LDA}: different classes are assumed to have the same covariance matrix, indicated by the ellipsoids. \textit{Gaussian Naive Bayes}: features are conditionally independent, yielding diagonal covariance matrices. \textit{Logistic regression}: a sigmoid function (curved plane) is fit to directly model class probabilities. \textit{SVM}: a hyperplane (solid line) is fit such that the margin (distance from hyperplane to closest sample; indicated by dotted lines) is maximized. \textit{Ensemble}: multiple classifiers are trained on subsets of the data. In this example, their hyperplanes partition the data into spaces belonging to classes 1 and 2. After applying all classifiers to a new data point and collecting their 'votes', the class receiving most votes is selected. \textit{Kernel methods}: in this example the optimal decision boundary is circular (dashed circle), hence the data is not linearly separable. After projection into a high-dimensional feature space using a map $\phi$, the data becomes linearly separable (dashed line) and a linear classifier such as SVM or LDA can be successfully applied.}}\label{fig:classifiers}
+\caption{Overview of the available classifiers. Dots represent samples, color indicates the class. \textit{LDA}: different classes are assumed to have the same covariance matrix, indicated by the ellipsoids. \textit{Gaussian Naive Bayes}: features are conditionally independent, yielding diagonal covariance matrices. \textit{Logistic regression}: a sigmoid function (curved plane) is fit to directly model class probabilities. \textit{SVM}: a hyperplane (solid line) is fit such that the margin (distance from hyperplane to closest sample; indicated by dotted lines) is maximized. \textit{Ensemble}: multiple classifiers are trained on subsets of the data. In this example, their hyperplanes partition the data into spaces belonging to classes 1 and 2. After applying all classifiers to a new data point and collecting their 'votes', the class receiving most votes is selected. \textit{Kernel methods}: in this example the optimal decision boundary is circular (dashed circle), hence the data is not linearly separable. After projection into a high-dimensional feature space using a map $\phi$, the data becomes linearly separable (dashed line) and a linear classifier such as SVM or LDA can be successfully applied.}\label{fig:classifiers}
 \end{figure}
 
 \begin{figure}[ht!]
