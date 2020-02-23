@@ -63,6 +63,7 @@
 % \newcommand{\xf}[1]{\mathbf{x}^{(#1)}} % x features
 \newcommand{\xf}[1]{x^{(#1)}} % x features
 \newcommand{\y}{\mathbf{y}}
+\newcommand{\yhat}{\widehat{\mathbf{y}}}
 \newcommand{\cov}{\text{cov}}
 \newcommand{\C}{\mathbf{C}}
 \newcommand{\E}{\mathbb{E}}   % expectation
@@ -211,7 +212,7 @@ MVPA-Light is shipped with a set of example scripts (in the \ttt{/examples} subf
 
 The EEG data has been taken from the BNCI-Horizon-2020 repository (http://bnci-horizon-2020.eu/database). It consists of three \ttt{mat} files corresponding to three subjects (subject codes \ttt{VPaak}, \ttt{VPaan}, and \ttt{VPgcc}) from the auditory oddball paradigm introduced in \cite{Treder2014}. Out of the experimental conditions, the "SynthPop" condition has been selected. Attended and unattended deviants are coded as class 1 and 2. The 64 EEG channels in the original dataset have been reduced to 32 channels.
 
-To give a concrete code example, consider the 'faces vs houses' experiment. For each trial, the BOLD response has been recorded for all voxels. This yields a [samples x voxels] data matrix for one subject, where the samples correspond to trials and the voxels serve as features. The matrix is denoted as \ttt{X}. Each trial corresponds to either a 'face' or a 'house' stimulus. This is encoded in a vector of class labels, denoted as \ttt{clabel}, that contains 1's and 2's ('face' = 1, 'house' = 2). Then the following piece of code performs 10-fold cross-validation with 2 repetitions. LDA is used as classifier and area under the ROC curve (AUC) is calculated as a classification metric.
+\red{To give a concrete code example, consider the 'faces vs houses' experiment. For each trial, the BOLD response has been recorded for all voxels. This yields a [samples x voxels] data matrix for one subject, where the samples correspond to trials and the voxels serve as features. The matrix is denoted as \ttt{X}. Each trial corresponds to either a 'face' or a 'house' stimulus. This is encoded in a vector of class labels, denoted as \ttt{clabel}, that contains 1's and 2's ('face' = 1, 'house' = 2). Then the following piece of code performs 10-fold cross-validation with 2 repetitions. LDA is used as classifier and area under the ROC curve (AUC) is calculated as a classification metric.}
 
 \begin{verbatim}
 cfg = [];
@@ -414,10 +415,10 @@ In kernel methods such as SVM and kernel FDA, a sample is implicitly mapped from
 
 \begin{equation}
 \label{eq:kernel_dval}
-\text{dval} = \w^\top\phi(\x) + b
+\text{dval} = \w_\phi^\top\phi(\x) + b
 \end{equation}
 
-If we compare this formula to \prettyref{eq:linear_dval}, it becomes evident that kernel classifiers are linear classifiers acting on non-linear transformations of the features. Often, it is  infeasible to explicitly apply the map due to the high dimensionality of $\mathcal{F}$.  However, for methods such as SVM and LDA, a very efficient workaround is available. They can be rewritten into a form wherein only the inner products between pairs of samples are needed, i.e. $\phi(\x)\cdot\phi(\x')$ for samples $\x$ and $\x'$. Now, if $\phi$ maps to a Reproducing Kernel Hilbert Space (RKHS), these inner products can be efficiently calculated via a kernel function $k$ that operates in input space, resulting in the identity $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. This is known as the \textit{kernel trick}.
+where $\w_\phi$ is the weight vector in feature space. If we compare this formula to \prettyref{eq:linear_dval}, it becomes evident that kernel classifiers are linear classifiers acting on non-linear transformations of the features. Often, it is  infeasible to explicitly apply the map due to the high dimensionality of $\mathcal{F}$.  However, for methods such as SVM and LDA, a very efficient workaround is available. They can be rewritten into a form wherein only the inner products between pairs of samples are needed, i.e. $\phi(\x)\cdot\phi(\x')$ for samples $\x$ and $\x'$. Now, if $\phi$ maps to a Reproducing Kernel Hilbert Space (RKHS), these inner products can be efficiently calculated via a kernel function $k$ that operates in input space, resulting in the identity $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. This is known as the \textit{kernel trick}.
 
 To give a simple example, consider two samples with  two-dimensional features, $\x = [x_1, x_2]$ and $\x' = [x_1', x_2']$. The homogeneous polynomial kernel of degree 2 has the kernel function $k(\x,\x') = (\sum_{i=1}^2 \x_i\x_i')^2$ and the corresponding feature map $\phi:\R^2\rightarrow\R^3$ with $\phi(\x)= [x_1^2, \sqrt{2}x_1 x_2, x_2^2]$. It is now easily verified that $k(\x,\x') = \phi(\x)\cdot\phi(\x')$. For LDA, a kernelized version called Kernel Fisher Discriminant Analysis (KFDA) has been developed by \cite{Mika1999FisherKernels}. It is available as \ttt{'kernel\_fda'}. Like in LDA, the model can be regularized using ridge regularization (\ttt{reg = 'ridge'}) or shrinkage regularization (\ttt{reg = 'shrink'}). The regularization hyperparameter \ttt{lambda} needs to be set by the user. For shrinkage, in many cases a small value (e.g. \ttt{lambda = 0.01}) is adequate. For both SVM and KFDA, the kernel can be chosen by setting the \ttt{kernel} parameter. Further information on the kernels is provided in the train functions.
 
@@ -445,12 +446,39 @@ In the high-level interface, the classifier output can be specified explicitly b
 
 Like classifiers, regression models are implemented using pairs of train/test functions. In the high-level function \ttt{mv\_regress}, a regression model is specified using the \ttt{cfg.model} parameter. Low-level access is possible by directly calling the train/test functions. For instance, \ttt{model = train\_ridge(param, X, y)} trains a ridge regression model. \ttt{X} is the training data and \ttt{y} are the corresponding responses. \ttt{param} is a MATLAB struct that contains hyperparameters. The output \ttt{model} is a struct that contains the model parameters after training. The model can be applied to test data by calling \ttt{yhat = test\_ridge(model, Xtest)} where \ttt{Xtest} is test data. The output of the test function is the model predictions. In the following section, the individual regression models are introduced. It is assumed that the data is contained in matrix $\X\in\R^{n \times p}$ of $n$ samples and $p$ predictors. The i-th row of this matrix is denoted as the column vector $\x_i\in\R^p$. Responses are stored in a vector $\y\in\R^n$ with $\y_i$ referring to the i-th response.
 
+%%% -------- LINEAR REGRESSION --------
+\subsubsection{\red{Perspective: linear  regression}}
+
+\red{Linear models such as Linear Regression, Ridge Regression, and linear Support Vector Regression, act on the data in a unified way by means of a vector of coefficients $\w$ (often represented by $\beta$'s in the literature). Linear regression models differ only in the way that $\w$ is derived. To simplify the notation, it is assumed that the data matrix $\X$ contains a column of ones and hence the intercept term is contained in $\w$. For a given sample $\x$, the \textit{predicted response} is given by $\widehat{y} = \w^\top\x$. The vector of predicted responses on the training data $\yhat\in\R^n$ can then succinctly written in matrix notation as }
+
+\begin{equation}
+\label{eq:linreg_prediction}
+\yhat = \X\w
+\end{equation}
+
+\red{During training, we are looking for a vector $\w$ such that $y_i \approx\widehat{y}_i$ for each training sample. A natural way to quantify how close the prediction is to the true response is the squared distance $(y_i - \widehat{y}_i)^2$, which directly leads to the sum of squares measure $\sum_{i=1}^n (y_i - \widehat{y}_i)^2$. In matrix notation, the sum of squares is denoted as}
+
+\begin{equation}
+\label{eq:linreg_loss_function}
+\L_\text{OLS}(\w) = ||\yhat - \X\w||^2
+\end{equation}
+
+\red{The solution that minimizes this quantity, known as ordinary least squares (OLS) solution to linear regression, is given by $\w = (\X^\top\X)^{-1}\ \X^\top\y$. This quantity is directly related to the MSE (mean squared error), a popular regression metric, since MSE is simply the sum of squares divided by $n$.}
+
 %%% -------- RIDGE --------
 \subsubsection{Ridge regression}
 
 \todo{add cost function, explain primal/dual}
 
-Ridge regression is a regularized version of ordinary least-squares (OLS) regression that is useful for analyzing data that suffers from multicollinearity. The model is regularized using a penalty that shrinks the weights towards zero. For a given regularization parameter \ttt{lambda}$\in[0,\infty)$, denoted by the Greek symbol $\lambda$, the primal and dual ridge solutions are given by
+Ridge regression is a regularized version of OLS regression that is useful for analyzing data that suffers from multicollinearity. The model is regularized using a L2 penalty that shrinks the weights towards zero. For a given regularization parameter \ttt{lambda}$\in[0,\infty)$, denoted by the Greek symbol $\lambda$, the loss function is given by
+
+\begin{equation}
+\label{eq:ridge_loss_function}
+\L_\text{ridge}(\w) = ||\yhat - \X\,\w||^2 + \lambda ||\w||^2
+\end{equation}
+
+\red{This convex optimization problem can be solved directly by calculating the gradient and setting it to zero. Alternatively, it can be rewritten into its dual Lagrangian form first  
+\citep{Bishop2007}. The resultant primal and dual ridge solutions that minimize the loss function are given by}
 
 
 \begin{align}
@@ -461,7 +489,10 @@ Ridge regression is a regularized version of ordinary least-squares (OLS) regres
 \end{split}
 \end{align}
 
-where $\I_p\in\R^{p\times p}$ and $\I_n\in\R^{n\times n}$ are identity matrices. For \ttt{lambda}=0 ridge regression reduces to ordinary least-squares regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger or smaller than $p$.
+where $\I_p\in\R^{p\times p}$ and $\I_n\in\R^{n\times n}$ are identity matrices. \red{The equivalence between the primal and dual solution can be verified by left-multiplying both sides of the equation with $(\X^\top\X + \lambda\I_p)$}.
+
+
+For \ttt{lambda}=0 ridge regression reduces to OLS regression. By default (\ttt{form = 'auto'}), MVPA-Light dynamically switches between the primal and the dual form depending on whether $n$ is larger or smaller than $p$.
 
 %%% -------- KERNEL RIDGE --------
 \subsubsection{Kernel ridge regression}
@@ -499,7 +530,7 @@ Classification & accuracy  &  [0,1] &  Fraction correctly predicted class labels
 &tval & ($-\infty,+\infty$) & For two classes only. T-test statistic for the unequal sample size, equal variance case, based on decision values.\\
 &none & ($-\infty,+\infty$) & Returns a cell array with the raw classifier outputs for all test sets.\\\hline
 Regression & MAE  & [$0,\infty$) &  Mean absolute error: $1/n \sum_{i=1}^n|y_i - \hat{y}_i|$.\\
-& MSE  & [$0,\infty$) &  Mean squared error: $1/n \sum_{i=1}^n|y_i - \hat{y}_i|^2$.\\
+& MSE  & [$0,\infty$) &  Mean squared error: $1/n \sum_{i=1}^n(y_i - \hat{y}_i)^2$.\\
 & $R^2$  & ($-\infty,1$] &  Fraction variance explained.\\
 \hline
 \end{tabularx}
@@ -622,12 +653,12 @@ The second plot depicts AUC as a function of frequency. The is some generalizati
 
 \prettyref{fig:fmri_results} depicts the results of the MVPA on the fMRI data, averaged across subjects.
 
-\textit{Confusion matrix}. A mask provided with the data was applied to select voxels from ventral temporal areas.
+\textit{Confusion matrix} (\prettyref{fig:fmri_results}a). A mask provided with the data was applied to select voxels from ventral temporal areas.
 A high overall performance is observed for LDA with 8 classes. Misclassifications tend to be confined to within more general semantic categories. For instance, misclassified faces tend to be labeled as cats (both living objects), whereas misclassified non-living objects tend to be labeled as other non-living objects. This indicates that there are shared representations for images from the same general category.
 
-\textit{Time classification}. Although all ROIs and time points yield performances above the chance level of 12.5\%, the ventral temporal area (which comprises both face and house responsive voxels) yields the best performance. For the latter, classification performance peaks at about 5 s after stimulus onset.
+\textit{Time classification} (\prettyref{fig:fmri_results}b). Although all ROIs and time points yield performances above the chance level of 12.5\%, the ventral temporal area (which comprises both face and house responsive voxels) yields the best performance. For the latter, classification performance peaks at about 5 s after stimulus onset.
 
-\textit{Searchlight analysis}. AUC values averaged across subjects are depicted. The AUCs are masked by the significant cluster ($p < .01$) and overlayed on an averaged anatomical MRI. Although the cluster is large, high values $>0.8$ are predominantly found in dorsal and ventral visual areas including the paraphippocampal place area and the fusiform area, nicely dovetailing with the original findings of \cite{Haxby2001}.
+\textit{Searchlight analysis} (\prettyref{fig:fmri_results}c). AUC values averaged across subjects are depicted. The AUCs are masked by the significant cluster ($p < .01$) and overlayed on an averaged anatomical MRI. Although the cluster is large, high values $>0.8$ are predominantly found in dorsal and ventral visual areas including the paraphippocampal place area and the fusiform area, nicely dovetailing with the original findings of \cite{Haxby2001}.
 
 \subsubsection{Benchmarking}
 
@@ -1042,12 +1073,12 @@ The MEEG dataset can be found in the OpenNeuro repository (https://openneuro.org
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{fmri_results}
-\caption{Results for the classification analysis of the \cite{Haxby2001} fMRI data. \red{a) Confusion matrix for multi-class (8 classes) classification, averaged across subjects. b) Multi-class (8 classes) classification accuracy was calculated for each time point following stimulus onset. Solid lines show the means across subjects and the shaded areas correspond to standard error. Masks were used to select voxels in the ventral temporal area (yellow line), voxels responsive to faces (blue), or voxels responsive to houses (red). c) Searchlight analysis using a binary classifier (faces vs houses). Red spots represent AUC values superimposed on axial slices of the averaged structural MRI. All depicted AUC values correspond to the significant cluster from the cluster permutation test; other AUC values have been masked out. }}\label{fig:fmri_results}
+\caption{Results for the classification analysis of the \cite{Haxby2001} fMRI data. \red{a) Confusion matrix for multi-class (8 classes) classification based on voxels in the ventral temporal area, averaged across subjects. b) Multi-class (8 classes) classification accuracy was calculated for each time point following stimulus onset. Lines depict the means across subjects, shaded areas correspond to standard error. Masks were used to select voxels in the ventral temporal area (yellow line), voxels responsive to faces (blue), or voxels responsive to houses (red). c) Cluster permutation test results based on a searchlight analysis using a binary classifier (faces vs houses). Red spots represent AUC values superimposed on axial slices of the averaged structural MRI. All depicted AUC values correspond to the significant cluster; other AUC values have been masked out. }}\label{fig:fmri_results}
 \end{figure}
 
 \begin{figure}[ht!]
 \centering\includegraphics[width=\linewidth]{benchmark_classification}
-\caption{Classification results for the benchmarking analysis using the MEG single-subjects data.}\label{fig:benchmarking}
+\caption{ERP classification results for the benchmarking analysis using the MEG single-subjects data.}\label{fig:benchmarking}
 \end{figure}
 
 \begin{figure}[ht!]
