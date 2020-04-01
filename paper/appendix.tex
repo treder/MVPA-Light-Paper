@@ -1,0 +1,353 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is just an example/guide for you to refer to when submitting manuscripts to Frontiers, it is not mandatory to use Frontiers .cls files nor frontiers.tex  %
+% This will only generate the Manuscript, the final article will be typeset by Frontiers after acceptance.
+%
+%
+%
+% When submitting your files, remember to upload this *tex file, the pdf generated with it, the *bib file (if bibliography is not within the *tex) and all the figures.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Version 3.4 Generated 2018/06/15 %%%
+%%% You will need to have the following packages installed: datetime, fmtcount, etoolbox, fcprefix, which are normally inlcuded in WinEdt. %%%
+%%% In http://www.ctan.org/ you can find the packages and how to install them, if necessary. %%%
+%%%  NB logo1.jpg is required in the path in order to correctly compile front page header %%%
+
+\documentclass[utf8,noinfo,a4paper]{frontiersSCNSappendix} % for Science, Engineering and Humanities and Social Sciences articles
+%\documentclass[utf8]{frontiersHLTH} % for Health articles
+%\documentclass[utf8]{frontiersFPHY} % for Physics and Applied Mathematics and Statistics articles
+
+%\setcitestyle{square} % for Physics and Applied Mathematics and Statistics articles
+%\usepackage{url,hyperref,lineno,microtype,subcaption}
+\usepackage{url,hyperref,microtype}
+\usepackage[onehalfspacing]{setspace}
+
+% \linenumbers
+
+
+% Leave a blank line between paragraphs instead of using \\
+
+
+\def\keyFont{\fontsize{8}{11}\helveticabold }
+\def\firstAuthorLast{Treder} %use et al only if is more than 1 author
+\def\Authors{Matthias S. Treder}
+% Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
+% If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
+\def\Address{School of Computer Science \& Informatics, Cardiff University, Cardiff, UK}
+% The Corresponding Author should be marked with an asterisk
+% Provide the exact contact address (this time including street name and city zip code) and email of the corresponding author
+% \def\corrAuthor{Corresponding Author}
+\def\corrAuthor{$\ $}
+
+\def\corrEmail{$\ $}
+% \def\corrEmail{trederm@cardiff.ac.uk}
+
+%%% --- added by Matthias ---
+\usepackage{tabularx}  % controls the table width
+\usepackage{multirow}
+\usepackage{prettyref}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{bbm}    % for 1 as a vector
+
+\newtheorem{theorem}{Theorem}
+
+% Math symbols
+\newcommand{\al}{\boldsymbol{\alpha}}
+\newcommand{\m}{\mathbf{m}}
+\newcommand{\mf}[2]{m_{#1#2}}
+% \newcommand{\mf}[2]{m_#1^{(#2)}}
+\newcommand{\mbar}{\overline{\m}}
+\newcommand{\mm}[1]{\m_{#1}}
+\newcommand{\sig}[2]{\sigma_{#1#2}^2}
+% \newcommand{\sig}[2]{(\sigma^2)_#1^{(#2)}}
+\newcommand{\w}{\mathbf{w}}
+\newcommand{\x}{\mathbf{x}}
+% \newcommand{\xf}[1]{\mathbf{x}^{(#1)}} % x features
+\newcommand{\xf}[1]{x^{(#1)}} % x features
+\newcommand{\y}{\mathbf{y}}
+\newcommand{\yhat}{\widehat{\mathbf{y}}}
+\newcommand{\cov}{\text{cov}}
+\newcommand{\C}{\mathbf{C}}
+\newcommand{\E}{\mathbb{E}}   % expectation
+\newcommand{\G}{\mathbf{G}}
+\newcommand{\I}{\mathbf{I}}
+\newcommand{\K}{\mathbf{K}}
+\renewcommand{\L}{\mathcal{L}}
+\newcommand{\M}{\mathbf{M}}
+\newcommand{\N}{\mathcal{N}}   % normal distribution
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\S}{\mathbf{S}}
+\newcommand{\Tr}[1]{\text{Tr}(#1)}
+\newcommand{\W}{\mathbf{W}}
+\newcommand{\X}{\mathbf{X}}
+\newcommand{\Y}{\mathbf{Y}}
+
+\newcommand{\ttt}[1]{\texttt{#1}}
+
+\newrefformat{fig}{Figure \ref{#1}}
+\newrefformat{tab}{Table \ref{#1}}
+\newrefformat{eq}{Equation \ref{#1}}
+\newrefformat{app}{Appendix \ref{#1}}
+\newrefformat{sec}{Section \ref{#1}}
+\newrefformat{lemma}{Lemma \ref{#1}}
+\newrefformat{theorem}{Theorem \ref{#1}}
+\newrefformat{assumption}{Assumption \ref{#1}}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{todo} #1}}
+
+\graphicspath{{../figures/}}
+
+
+\begin{document}
+\onecolumn
+\firstpage{1}
+
+\title[MVPA-Light Appendix]{Appendix for \textit{MVPA-Light: a classification and regression toolbox for multi-dimensional data}}
+
+\author[\firstAuthorLast ]{\Authors} %This field will be automatically populated
+\address{} %This field will be automatically populated
+% \correspondance{} %This field will be automatically populated
+
+% \extraAuth{}% If there are more than 1 corresponding author, comment this line and uncomment the next one.
+%\extraAuth{corresponding Author2 \\ Laboratory X2, Institute X2, Department X2, Organization X2, Street X2, City X2 , State XX2 (only USA, Canada and Australia), Zip Code2, X2 Country X2, email2@uni2.edu}
+
+
+% \maketitle
+
+
+% \begin{abstract}
+% \end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% --------- APPENDIX ---------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{section}{3}
+
+\section{Appendix}
+
+
+%%% -------- LDA --------
+\subsection{LDA implementation}\label{sec:lda_implementation}
+
+The implementation of LDA in MVPA-Light differs from the generative model presented in section 2.4.3. (main paper). It uses the more efficient Fisher Discriminant Analysis (FDA)  \citep{Fisher1936} which omits calculating probabilities and operates in two steps. In the first step, the data is mapped onto a $(c-1)$-dimensional subspace, where $c$ is the number of classes. In the second step, a sample is assigned to the class with the closest class centroid. LDA thus acts as a prototype classifier within this subspace. The coordinates for the mapping are found by iteratively solving the equation
+
+\begin{equation}
+\label{eq:fda}
+\w_{\text{lda}} = \underset{\w}{\text{arg max}}\ \frac{\w^\top \S_b\w}{\w^\top \S_w\w}
+\end{equation}
+
+where $\S_b$ and $\S_w$ are defined as
+
+\begin{equation*}
+%\label{eq:scatter-means-multi}
+\begin{alignedat}{2}
+\S_b =\ & \sum_{j\,\in\{1,2,...,c\}}n_j\,(\mm{j} -\mbar) (\mm{j} - \mbar)^\top\ \quad &&\text{(between-classes scatter)}\\
+\S_w =\ & \sum_{j\,\in\{1,2,...,c\}}\sum_{i\in\mathcal{C}_j} (\x_i - \mm{j})(\x_i - \mm{j})^\top\  \quad &&\text{(within-class scatter)}\\
+\end{alignedat}
+\end{equation*}
+
+Here, $n_j$ is the number of instances in class $j$, $\m_j$ is the $j$-th class mean, $\mbar$ is the sample mean, and $\mathcal{C}_j$ is the set of indices of instances in class $j$. Note that $\S_w$ is simply the un-normalized version of $\mathbf{\Sigma}$ in Equation 3 (main paper). For two classes, LDA has the simple solution
+
+\begin{equation}
+\label{eq:lda_solution}
+\w_{\text{lda}} = \S_w^{-1}\ (\m_1 - \m_2).
+\end{equation}
+
+For more than two classes, there is multiple vectors $\w_{\text{lda}}$. They are collected in a matrix $\W\in\R^{p\times(c-1)}$ and scaled such that $\W^\top\S_w\W = \I$ \citep{Bishop2007}. $\W$ can be obtained via the generalized eigenvalue problem $\S_b\,\W = \S_w\,\W\mathbf{\Lambda}$ where $\mathbf{\Lambda}$ is a diagonal matrix of eigenvalues.
+The threshold is calculated under the assumption of equal probabilities for the classes. $\S_w$ is often ill-conditioned or singular and hence the inverse in \prettyref{eq:lda_solution} cannot be calculated reliably. Therefore, shrinkage regularization is applied by default and $\S_w$ is replaced by $\widetilde{\S}_w$:
+
+\begin{align}
+\label{eq:shrinkage}
+\widetilde{\S}_w = (1-\lambda)\ \S_w + \lambda\,\nu\,\I
+\end{align}
+
+where $\I$ is the identity matrix and $\nu = \text{trace}(\S_w)/p$ \citep{Blankertz2011}. For $\lambda=1$, LDA becomes a prototype classifier, that is, each sample is assigned to the closest centroid in input space. The effect of shrinkage regularization is depicted in \prettyref{fig:lda}. In the literature, LDA has also been used with ridge-regression type regularization, yielding $\widetilde{\S}_w = \S_w + \lambda_\text{ridge}\,\I$ with $\lambda_\text{ridge}\in [0,\infty)$ \citep{Friedman1989RegularizedAnalysis}. The user can switch to ridge regularization by setting \ttt{reg = 'ridge'}. However, both regularization approaches are equivalent up to scaling. For a given shrinkage value $\lambda<1$, the corresponding ridge regularization value is $\lambda_\text{ridge} = \nu\lambda / (1-\lambda)$.
+
+If $p \gg n$, that is, the number of features is much larger than the number of samples, calculation and inversion of the [features $\times$ features] covariance matrix can be computationally expensive. In these cases, the [samples $\times$ samples] Gram matrix can be used instead. The hyperparameter \ttt{form} decides on whether the 'primal' form based on covariance or 'dual' form based on the Gram matrix is used. By default (\ttt{form = 'auto'}), this is decided automatically by comparing $n$ and  $p$. For the dual form, the resultant formula is equivalent to kernel FDA with a linear kernel. However, the regularization of $\mathbf{N}$ in  kernel FDA is not equivalent to the regularization of $\S_w$. Furthermore, to the best of our knowledge, the Ledoit-Wolf estimate has not been reported in the literature using dual notation. Therefore, a dual regularization approach for LDA is developed next.
+
+\begin{figure}
+\centering\includegraphics[width=\linewidth]{figures/LDA_regularization}
+\caption{a) LDA with two classes. Covariance matrices are indicated by ellipses. The weight vector $\w$ is the normal to the hyperplane. b) Effect of varying $\lambda$ on the shape of the covariance matrix. c) Covariance matrices estimated from data usually overestimate large eigenvalues \citep{Blankertz2011}. d) The shrinkage estimate $\widetilde{\S}_w$ partially corrects the estimation error by shrinking towards a spherical covariance $\nu\mathbf{I}$.}\label{fig:lda}
+\end{figure}
+
+
+\subsubsection{Dual regularization of LDA}\label{app:dualLDA}
+
+The goal of this section is to develop a dual regularization approach for LDA that is equivalent to the primal regularization approach. This is important in order to assure that switching from primal to dual form with an equal regularization magnitude $\lambda$ does not affect the solution $\w$. The approach consists of two steps. First, the Ledoit-Wolf estimate for the optimal regularization hyperparameter $\lambda^*$ needs to be calculated using the Gram matrix instead of the covariance matrix. Second, it needs to be assured that the dual regularization yields the same $\w$ as the primal approach.
+
+\subsubsection{Dual Ledoit-Wolf estimate}
+
+The Ledoit-Wolf estimate \citep{Ledoit2004HoneyMatrix,Blankertz2011} for the optimal regularization hyperparameter, denoted as $\lambda^*$, can be formulated as
+
+\begin{equation}\label{eq:LedoitWolf}
+\lambda^* = \frac{\sum_{i=1}^n ||\S - \x_i\x_i^\top||_F^2}%
+{n^2 [\,\Tr{\S^2} - \Tr{\S}^2/p\,]}
+\end{equation}
+
+where $\mathbf{S}= \frac{1}{n}\X^\top\X$, $\text{Tr}$ is the trace operator and $\X$ is assumed to be zero mean (column-wise). In a finite sample, $\lambda^*$ can take values smaller than 0 or larger than 1, so it is additionally thresholded between 0 and 1.
+
+To rewrite \prettyref{eq:LedoitWolf} in terms of the Gram matrix $\K= \X\X^\top$ observe that in the numerator we can write $||\S - \x_i\x_i^\top||_F^2 = \Tr{\K^2}/n^2 - 2\,\Tr{\S\,\x_i\x_i^\top} + \langle\x_i,\x_i\rangle^2$. For the middle term we have $\Tr{\S\,\x_i\x_i^\top} = \Tr{\frac{1}{n}\sum_{j=1}^n \x_j\x_i^\top\langle\x_i,\x_j\rangle} = \frac{1}{n}\sum_{j=1}^n \langle\x_i,\x_j\rangle^2$. In other words, we can rewrite the Ledoit-Wolf estimate in terms of inner products as
+
+\begin{equation}\label{eq:LedoitWolfDual}
+\lambda^* = \frac{\Tr{\K^2}/n - 2\sum_{i=1}^n\sum_{j=1}^n \K_{ij}^2/n + \sum_{i=1}^n \K_{ii}^2 }%
+{\Tr{\K^2} - \Tr{\K}^2/p}
+\end{equation}
+
+where the identity $\Tr{\S^2} = \Tr{\K^2}/n^2$ has been used. Both primal and dual estimation of $\lambda^*$ are implemented in the function \ttt{LedoitWolfEstimate}. This approach generalizes to kernel FDA when the Gram matrix is replaced by the kernel matrix.
+
+
+\subsubsection{Dual regularization}
+
+The relationship between primal weights $\w$ and dual weights $\al$ is given by $\w = \X^\top\al$. The denominator of the Fisher ratio in \prettyref{eq:fda} can be related to the dual problem as $\w^\top\S_w\w = \al^\top\mathbf{N}\al$ \citep{Ghojogh2019FisherTutorial} where $\mathbf{N}$ is the "dual" of $\S_w$ (see \prettyref{eq:kernelFDA}). For the ridge regularized case, we then obtain
+
+\begin{align}
+\begin{split}
+\label{eq:dualLDA}
+\w^\top(\S_w + \lambda\I)\,\w =&\ \al^\top(\mathbf{N} + \lambda\K)\al
+\end{split}
+\end{align}
+
+where $\K$ is the Gram matrix as defined above. The optimal $\al$ is given by $(\mathbf{N} + \lambda\K)^{-1}(\M_1 - \M_2)$ where $\M_j$ is defined as in \prettyref{eq:kernelFDA}. The result for shrinkage regularization is analogous.
+
+%%% -------- NAIVE BAYES --------
+\subsection{Naive Bayes implementation}\label{sec:naive_bayes_implementation}
+
+MVPA-Light uses Gaussian distributions to model the univariate densities, that is $P(\xf{j}\,|\,y = i) = \frac{1}{\sqrt{2\pi\sig{i}{j}}} \exp(-\frac{(\xf{j} - \mf{i}{j})^2}{2\sig{i}{j}})$. The parameters of the model are thus the $\mf{i}{j}$'s (mean of the $j$-th feature in class $i$) and $\sig{i}{j}$'s (variance of the $j$-th feature in class $i$) estimated on the training data. Inserting the Gaussian densities into Equation 2 (main paper) yields
+
+\begin{equation}
+\label{eq:naive_bayes_gaussian}
+P(y = i\,|\,\x) = \frac{\prod_{j=1}^p \frac{1}{\sqrt{2\pi\sig{i}{j}}} \exp(-\frac{(\xf{j} - \mf{i}{j})^2}{2\sig{i}{j}})\ P(y = i)}%
+{\sum_{k=1}^c \prod_{j=1}^p \frac{1}{\sqrt{2\pi\sig{k}{j}}} \exp(-\frac{(\xf{j} - \mf{k}{j})^2}{2\sig{k}{j}})\ P(y = k)}.
+\end{equation}
+
+Classification is computationally more efficient if the denominator (which is necessary for normalization only) is omitted and the numerator is log transformed. This leads to the class-conditional decision values $d_i$,
+
+\begin{equation}
+\label{eq:naive_bayes_dval}
+d_i = - \frac{1}{2}\sum_{j=1}^p \text{log}(2\pi\,\sig{i}{j}) - \sum_{j=1}^p \frac{(\xf{j} - \mf{i}{j})^2}{2\sig{i}{j}} + \log P(y = i)
+\end{equation}
+
+which can be transformed into posterior probabilities using the softmax function
+
+\begin{equation}
+\label{eq:naive_bayes_softmax}
+P(y = i\,|\,\x) = \frac{e^{d_i}}{\sum_{k=1}^c e^{d_k}}.
+\end{equation}
+
+%%% -------- LOGISTIC REGRESSION --------
+\subsection{Logistic Regression implementation}\label{sec:logreg_implementation}
+
+The optimization problem underlying Logistic Regression is convex but there exists no analytical solution. Instead, an iterative algorithm is required to optimize $\w$. In MVPA-Light, the Trust Region Newton Method introduced by \cite{Lin2007TrustRegression} is implemented in the function \ttt{TrustRegionDoglegGN}. Two regularization techniques are implemented, log-F(1,1) and L2. Whereas log-F(1,1) regularization is implemented via data augmentation,  L2 regularization is realized by adding a penalty term to the loss function:
+
+\begin{equation}
+\label{eq:logreg_loss_function_plus_penalty}
+\L_\text{LR}^{L2}(\w) = \L_\text{LR}(\w) + \frac{\lambda}{2}\, ||\w||^2
+\end{equation}
+
+Here, $\lambda\in [0,\infty)$ controls the amount of regularization. While log-F(1,1) regularization does not require any hyperparameters, L2-regularization requires $\lambda$ to be set. The effect of regularization on the predicted probabilities is depicted in \prettyref{fig:logreg}. If multiple candidates are provided for $\lambda$, a line search is performed using nested cross-validation. This kind of line search is costly, since the classifier has to be trained multiple times for each value of the hyperparameter. To speed up the search, 'warm starts' can be used wherein the initial value for $\w$, denoted as  $\w_\text{init}$, is a function of the solutions in previous iterations. If \ttt{predict\_regularization\_path=1}, then in the $k$-th iteration, a polynomial function is fit to the solutions $\w_{k-1},\w_{k-2},...$ to the previous iterations  using $\lambda_{k-1}, \lambda_{k-2}, ...$ as predictors. It is then evaluated at the current value of $\lambda$ in order to predict a good starting vector for the optimization.
+
+\begin{figure}
+\centering\includegraphics[width=\linewidth]{figures/logreg_regularization}
+\caption{Logistic regression on data with two features (x and y axis) and two classes represented by purple (class 1) and green (class 2) dots. The curved surface is the sigmoid function fit and the vertical z-axis represents the probability for class 1. In L2 regularization, a larger $\lambda$ leads to a flatter sigmoid function with smoothly varying probabilities. For comparison, the sigmoid fit using log-F(1,1) regularization is also shown.}\label{fig:logreg}
+\end{figure}
+
+
+%%% -------- SVM --------
+\subsection{SVM implementation}\label{sec:svm_implementation}
+
+The formulation of SVM in Equation 6 (main paper) is intuitive but limited to the linear case. It can be rewritten into a dual formulation which applies to both linear and kernel case  \citep{Hsieh2008ASVM}. The optimal weights are then found by solving the quadratic optimization problem
+
+\begin{align}
+\begin{split}
+\label{eq:svm_dual_loss_function}
+\underset{\al}{\text{arg min}}\quad
+& \frac{1}{2} \al^\top\Q\,\al - \mathbbm{1}^\top\al\\
+\text{subject to}\quad  &\ \forall i: 0 \le \alpha_i \le c
+\end{split}
+\end{align}
+
+where $\al=[\alpha_1,\alpha_2,...,\alpha_n]^\top\in\R^n$ is the dual weight vector and  $\mathbbm{1}$ is a vector of 1's. $\Q$ is the kernel matrix with the class labels absorbed, i.e. $\Q_{ij} = y_i y_j\, k(\x_i,\x_j)$, where $k$ is the kernel function, and $y_i, y_j \in\{+1, -1\}$ are the class labels for the $i$-th and $j$-th sample. The hyperparameter \ttt{c} controls the amount of regularization. The optimization of the weights is performed using a Dual Coordinate Descent approach  \citep{Hsieh2008ASVM} implemented in the function \ttt{DualCoordinateDescent}.
+
+
+%%% -------- KERNEL FDA --------
+\subsection{KFDA implementation}\label{sec:kfda_implementation}
+
+Let $\K\in\R^{n\times n}$ be the kernel matrix representing the inner products of the samples in the Reproducing Kernel Hilbert Space (RKHS) and $\K_j\in\R^{n \times n_j}$ be the submatrix of $\K$ with columns corresponding to samples in class $j$. The kernelized versions of between-classes and within-class scatter are given by the matrices $\M$ and $\mathbf{N}$ as
+
+
+\begin{equation}
+\label{eq:kernelFDA}
+\begin{alignedat}{2}
+\M =\ &  \sum_{j=1}^c n_j\ (\M_j - \M_*)\,(\M_j-\M_*)^\top\\
+\mathbf{N} =\ & \sum_{j=1}^c \K_j\ (\mathbf{I} - \frac{1}{n_j}\mathbbm{1}\,\mathbbm{1}^\top)\  \K_j^\top
+\end{alignedat}
+\end{equation}
+
+where $\M_j\in\R^n$ is the mean of the columns of $\K_j$ and $\M_*$ is the mean of the columns of $\K$. Then the solution is given by the $(c-1)$ leading eigenvectors of $\mathbf{N}^{-1} \mathbf{M}$.
+Like in LDA, the model can be regularized using ridge regularization (\ttt{reg = 'ridge'}) or shrinkage regularization (\ttt{reg = 'shrink'}). Using shrinkage, $\mathbf{N}$ is replaced by $\widetilde{\mathbf{N}} = (1-\lambda)\ \mathbf{N} + \lambda\,\text{trace}(\mathbf{N})/n\,\I$.
+
+
+%%% -------- PROTOTYPE CLASSIFIER --------
+\subsection{Implementing a prototype classifier}
+
+This section illustrates how to implement a prototype classifier that assigns a new sample to the class with the closest class centroid. Class centroids are calculated from the training data by calculating the means of the samples within each class. This example is mostly didactic. A prototype classifier can be simulated with LDA or multi-class LDA by setting \ttt{reg = 'shrink'} and \ttt{lambda = 1}.
+
+First, the train function needs to be implemented. As input arguments, train functions take a \ttt{param} struct which is short notation for 'hyperparameter'. It corresponds to the \ttt{cfg.hyperparameter} struct defined in the high-level functions. Additionally, it takes the training data \ttt{X} and the corresponding class labels \ttt{clabel}. For brevity, most of the documentation is omitted.
+
+\begin{verbatim}
+    function model = train_prototype(param, X, clabel)
+
+    nclasses = max(clabel);
+
+    % Classifier struct
+    model  = [];
+    model.nclasses = nclasses;
+
+    %% Calculate class centroids
+    model.centroid = zeros(nclasses, size(X,2));
+    for c=1:nclasses
+        model.centroid(c,:) = mean(X(clabel==c,:));
+    end
+\end{verbatim}
+
+The output of the train function is a structure \ttt{model} that describes the parameters of the classifier after training. The test function takes the classifier \ttt{model} and the test data \ttt{X} as input. For classification, we need to calculate the Euclidean distance between each test sample and each of the centroids. Then, each sample is assigned to the closest class centroid.
+
+\begin{verbatim}
+    function clabel = test_prototype(model, X)
+
+    % Euclidean distance of each sample
+    % to each class centroid
+    dist = arrayfun( @(c) sum( bsxfun(@minus, X, ...
+        model.centroid(c,:)).^2, 2), ...
+        1:model.nclasses, 'Un',0);
+    dist = cat(2, dist{:});
+
+    % For each sample, find the closest centroid
+    clabel = zeros(size(X,1),1);
+    for ii=1:size(X,1)
+        [~, clabel(ii)] = min(dist(ii,:));
+    end
+
+\end{verbatim}
+
+The output of the test function is \ttt{clabel}, the vector of predicted class labels. Finally, an entry for \ttt{prototype} needs to be added to the function \ttt{mv\_get\_hyperparameter}. Since the prototype classifier has no hyperparamaters, this entry can be empty. Provided that the train and test functions are in the MATLAB path, the new classifier can be used with all high-level functions by setting \ttt{cfg.model = 'prototype'}.
+
+
+\bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
+%\bibliographystyle{frontiersinHLTH&FPHY} % for Health, Physics and Mathematics articles
+\bibliography{references}
+
+%%% Make sure to upload the bib file along with the tex file and PDF
+%%% Please see the test.bib file for some examples of references
+
+
+%%% If you are submitting a figure with subfigures please combine these into one image file with part labels integrated.
+%%% If you don't add the figures in the LaTeX files, please upload them when submitting the article.
+%%% Frontiers will add the figures at the end of the provisional pdf automatically
+%%% The use of LaTeX coding to draw Diagrams/Figures/Structures should be avoided. They should be external callouts including graphics.
+\end{document}
