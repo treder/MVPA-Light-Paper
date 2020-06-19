@@ -1,6 +1,6 @@
 # MVPA-Light-Paper
 
-This is the companion repository of the [MVPA-Light paper](todo). 
+This is the companion repository of the [MVPA-Light paper](https://www.frontiersin.org/articles/10.3389/fnins.2020.00289/full). 
 
 Content of the subfolders
 
