@@ -2,7 +2,7 @@
 
 This is the companion repository of the [MVPA-Light paper](https://www.frontiersin.org/articles/10.3389/fnins.2020.00289/full). 
 
-### Content of the subfolders
+### Content of the subfolders
 
 * [analysis](analysis): scripts for all the analyses (using of the EEG/MEG and fMRI datasets) reported in the paper. The following scripts replicate the analyses reported in the paper:
   * [preprocess_WakemanHenson](analysis/preprocess_WakemanHenson.m): Uses FieldTrip to preprocess the Wakeman and Henson EEG/MEG data.
