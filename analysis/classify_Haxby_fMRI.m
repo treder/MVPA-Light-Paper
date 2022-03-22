@@ -9,7 +9,7 @@ close all
 clear
 
 % define directories
-rootdir     = '/data/neuroimaging/Haxby2001_fMRI/';
+rootdir     = '~/data/neuroimaging/Haxby2001_fMRI/';
 preprocdir  = [rootdir 'preprocessed/'];
 figdir      = [rootdir 'figures/'];
 resultsdir  = [rootdir 'results/'];
@@ -130,19 +130,21 @@ for n=1:nsubjects     % --- loop across subjects
     % Instead of randomized k-fold cross-validation, we will exploit the
     % fact that the data has been separated into 12 runs, so we will treat
     % each run as a separate fold. This can be done by setting
-    % cv='leavegroupout'
+    % cv='predefined'
     cfg = [];
-    cfg.cv      = 'leavegroupout';
-    cfg.group   = y.chunks;
+    cfg.cv      = 'predefined';
+    cfg.fold   = y.chunks;
     cfg.repeat  = 1;
     cfg.metric  = 'confusion';
     cfg.classifier  = 'multiclass_lda';
+    cfg.dimension_names = {'trials' 'voxels'};
     
-    [acc_vt_hp, res_confusion{n}] = mv_crossvalidate(cfg, fmri.vt_hp', clabel);
+    [acc_vt_hp, res_confusion{n}] = mv_classify(cfg, fmri.vt_hp', clabel);
     
     %% Classify across time
-    cfg.group   = y.chunks(1:9:end);
+    cfg.fold   = y.chunks(1:9:end);
     cfg.metric  = 'accuracy';
+    cfg.dimension_names = {'trials' 'voxels' 'time points'};
     [acc_time_face_roi, res_time{n,1}]  = mv_classify_across_time(cfg, fmri.trial_face, clabel9);
     [acc_time_house_roi, res_time{n,2}] = mv_classify_across_time(cfg, fmri.trial_house, clabel9);
     [acc_time_vt_roi, res_time{n,3}]    = mv_classify_across_time(cfg, fmri.trial_vt, clabel9);
@@ -206,12 +208,13 @@ for n=1:nsubjects     % --- loop across subjects
     cfg.feedback    = 1;
 
     % cross-validation settings
-    cfg.cv          = 'leavegroupout';
-    cfg.group       = y_face_house.chunks;
+    cfg.cv          = 'predefined';
+    cfg.fold        = y_face_house.chunks;
     cfg.repeat      = 1;
 
     cfg.dimension_names     = {'voxel x' 'voxel y' 'voxel z' 'samples'};
     cfg.sample_dimension    = 4;    % dimension 1 in the data represents the samples/different time points
+    cfg.feature_dimension   = [];   % since we are using a searchlight, there is no specific dimension representing the features
     cfg.neighbours          = neighbours;
     
     tic
@@ -224,8 +227,8 @@ for n=1:nsubjects     % --- loop across subjects
 %     cfg.feedback    = 1;
 % 
 %     % cross-validation settings
-%     cfg.cv          = 'leavegroupout';
-%     cfg.group       = y_face_house.chunks;
+%     cfg.cv          = 'predefined';
+%     cfg.fold        = y_face_house.chunks;
 %     cfg.repeat      = 1;
 % 
 %     cfg.dimension_names     = {'samples' 'voxels'};
@@ -238,7 +241,7 @@ for n=1:nsubjects     % --- loop across subjects
 end
 
 save([resultsdir 'Haxby_fmri_classification_results'], 'res*', 'nb','acc_searchlight', ...
-    'nsubjects', 'classes', 'face_house_bold', 'clabel_face_house','vox_dim')
+    'nsubjects', 'classes', 'face_house_bold', 'clabel_face_house')
 
 fprintf('Finished all.\n')
 return
